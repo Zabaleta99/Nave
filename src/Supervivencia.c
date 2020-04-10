@@ -7,6 +7,7 @@
 #define IZQUIERDA 1
 #define BAJO 19
 #define DERECHA 95
+#define MAX_AST 10
 
 typedef struct 
 {
@@ -19,6 +20,29 @@ typedef struct
 	int x;
 	int y;
 } Asteroide;
+
+void mostrarNivel(int* num_ast)
+{
+	WINDOW* nivel = newwin(5,21,12,50);
+	refresh();
+	box(nivel,0,0);
+	wmove(nivel,2, 6);
+	wprintw(nivel, "NIVEL: %d", *num_ast);
+	wrefresh(nivel);
+	sleep(3);
+}
+
+void subirNivel(Asteroide* asteroides, int* num_ast)
+{
+	if(*num_ast <= MAX_AST)
+	{
+		asteroides[*num_ast].x = IZQUIERDA;
+		asteroides[*num_ast].y = (rand()%(BAJO-ALTO+1)) + ALTO;
+		(*num_ast)++;
+
+		mostrarNivel(num_ast);
+	}
+}
 
 void gameOver(void)
 {
@@ -107,34 +131,55 @@ int main(void)
     nave->x = 50;
     nave->y = 19;
 
+    Asteroide* asteroides = malloc(MAX_AST * sizeof(Asteroide));
+
+    int* num_ast = malloc(sizeof(int));
+    *num_ast = 1;
+    float segundos = 0;
+
     Asteroide* asteroide1 = malloc(sizeof(Asteroide));
-    asteroide1->x = 25;
-    asteroide1->y = ALTO;
+    asteroides[0].x = 25;
+    asteroides[0].y = ALTO;
 
-    Asteroide* asteroide2 = malloc(sizeof(Asteroide));
-    asteroide2->x = 75;
-    asteroide2->y = ALTO;
-
-    Asteroide* asteroide_horizontal1 = malloc(sizeof(Asteroide));
-    asteroide_horizontal1->x = IZQUIERDA;
-    asteroide_horizontal1->y = 15;
-
-    Asteroide* asteroide_horizontal2 = malloc(sizeof(Asteroide));
-    asteroide_horizontal2->x = IZQUIERDA;
-    asteroide_horizontal2->y = 5;
+    mostrarNivel(num_ast);
     
-     while(1)
+    while(1)
     {
     	
         actualizar(ventana);
-        if(choque(ventana, nave, asteroide1) == 1|| choque(ventana, nave, asteroide2) || choque(ventana, nave, asteroide_horizontal1) || choque(ventana, nave, asteroide_horizontal2))
+        if(segundos > 30)
+        {
+        	subirNivel(asteroides, num_ast);
+        	segundos = 0;
+        }
+
+        int aux = 0;
+        for(int i=0; i<*num_ast; i++)
+        {
+        	if(choque(ventana, nave, &asteroides[i]))
+        	{
+        		aux = 1;
+        		break;	
+        	}
+        }
+
+        if(aux == 1)
         {
         	break;
         }
-        pintarAsteroideVertical(ventana, asteroide1);
-        pintarAsteroideVertical(ventana, asteroide2);
-        pintarAsteroideHorizontal(ventana, asteroide_horizontal1);
-        pintarAsteroideHorizontal(ventana, asteroide_horizontal2);
+
+        for(int i=0; i<*num_ast; i++)
+        {
+        	if(i==0)
+        	{
+        		pintarAsteroideVertical(ventana, &asteroides[i]);
+        	}
+        	else
+        	{
+        		pintarAsteroideHorizontal(ventana, &asteroides[i]);
+        	}
+        }
+        
         pintarNave(ventana, nave);
           							
         wrefresh(ventana);
@@ -175,6 +220,7 @@ int main(void)
         	break;
 
         Sleep(35);
+        segundos +=0.035;
 
     }
 
