@@ -147,7 +147,7 @@ int main(void)
     {
     	
         actualizar(ventana);
-        if(segundos > 30)
+        if(segundos > 15)
         {
         	subirNivel(asteroides, num_ast);
         	segundos = 0;
