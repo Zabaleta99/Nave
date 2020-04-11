@@ -37,7 +37,7 @@ void mostrarNivel(int* num_ast)
 
 void subirNivel(Asteroide* asteroides, int* num_ast)
 {
-	if(*num_ast <= MAX_AST)
+	if(*num_ast < MAX_AST)
 	{
 		asteroides[*num_ast].x = IZQUIERDA;
 		asteroides[*num_ast].y = (rand()%(BAJO-ALTO+1)) + ALTO;
@@ -62,8 +62,6 @@ void pintarNaveChoque(WINDOW* ventana, Nave* nave)
 {
 	wmove(ventana, nave->y, nave->x); wprintw(ventana, "\"\"\"\"");
 	wmove(ventana, nave->y-1, nave->x+1); wprintw(ventana, "\"\"");
-	wrefresh(ventana);
-	Sleep(500);
 }
 
 void nuevoAsteroideVertical(Asteroide* asteroide)
@@ -84,7 +82,7 @@ void pintarAsteroideVertical(WINDOW* ventana, Asteroide* asteroide)
 
 	asteroide->y++;
 
-	if(asteroide->y == BAJO)
+	if(asteroide->y == BAJO+2)
 	{
 		nuevoAsteroideVertical(asteroide);
 	}
@@ -198,6 +196,8 @@ int menuSalida(void)
 
 int main(void)
 {
+	sndPlaySound("song.wav", SND_ASYNC | SND_LOOP);
+
     initscr();
 	curs_set(0);
 	move(1,3);
@@ -253,29 +253,31 @@ int main(void)
 	        		break;	
 	        	}
 	        }
-	        if(aux == 0)
-	        	pintarNave(ventana, nave);
-	        else
-	        {
-	        	aux = 0;
-	        	pintarNaveChoque(ventana, nave);
-	        }
-	        
-	        if(nave->vidas == 0)
-	        {
-	        	gameOver();
-	        	break;
-	        }
-	       
+
 	        for(int i=0; i<*num_ast; i++)
 	        {
 	        	if(asteroides[i].tipo == 0)
 	        		pintarAsteroideVertical(ventana, &asteroides[i]);
 	        	else
 	        		pintarAsteroideHorizontal(ventana, &asteroides[i]);
-	        }							
+	        }
+
+	        if(aux == 0)
+	        	pintarNave(ventana, nave);
+	        else
+				pintarNaveChoque(ventana, nave);
+	        						
 	        wrefresh(ventana);
+	        if(aux == 1) Sleep(500);
+
+	        if(nave->vidas == 0)
+	        {
+	        	gameOver();
+	        	break;
+	        }	
+
 	        tecla = wgetch(ventana);
+
 	        switch(tecla)
 	        {
 	            case KEY_UP:
@@ -307,6 +309,7 @@ int main(void)
 	        }
 	        Sleep(35);
 	        segundos +=0.035;
+	        aux = 0;
 	    }
 	    actualizar(ventana,nave);
 	    if(menuSalida())
