@@ -69,13 +69,13 @@ void pintarNaveChoque(WINDOW* ventana, Nave* nave)
 void nuevoAsteroideVertical(Asteroide* asteroide)
 {
 	asteroide->x = (rand()%(DERECHA-IZQUIERDA+1)) + IZQUIERDA;
-	asteroide->y = ALTO;
+	asteroide->y = ALTO-2;
 }
 
 void nuevoAsteroideHorizontal(Asteroide* asteroide)
 {
 	asteroide->y = (rand()%(BAJO-ALTO+1)) + ALTO;
-	asteroide->x = IZQUIERDA;
+	asteroide->x = IZQUIERDA-2;
 }
 
 void pintarAsteroideVertical(WINDOW* ventana, Asteroide* asteroide)
@@ -121,10 +121,17 @@ int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide)
 		return 0;
 }
 
-void actualizar(WINDOW* ventana)
+void pintarVidas(Nave* nave)
+{
+	move(2,64); printw("%i",nave->vidas);
+	refresh();
+}
+
+void actualizar(WINDOW* ventana, Nave* nave)
 {
 	werase(ventana);
-    box(ventana, 0,0);
+	pintarVidas(nave);
+   	box(ventana, 0,0);
 }
 
 void pintarNave(WINDOW* ventana, Nave* nave)
@@ -195,6 +202,8 @@ int main(void)
 	curs_set(0);
 	move(1,3);
 	printw("Bienvenido: MODO SUPERVIVENCIA");
+	move(2,57); 
+	printw("Vidas: ");
     WINDOW* ventana = newwin(BAJO+2, DERECHA+6, 3, 9);
 
     refresh();
@@ -230,7 +239,7 @@ int main(void)
 
 	    while(1)
 	    {
-	        actualizar(ventana);
+	        actualizar(ventana, nave);
 	        if(segundos > 15)
 	        {
 	        	subirNivel(asteroides, num_ast);
@@ -299,6 +308,7 @@ int main(void)
 	        Sleep(35);
 	        segundos +=0.035;
 	    }
+	    actualizar(ventana,nave);
 	    if(menuSalida())
     		break;
     	segundos = 0;
