@@ -196,10 +196,21 @@ int menuSalida(void)
 
 int main(void)
 {
-	sndPlaySound("song.wav", SND_ASYNC | SND_LOOP);
-
     initscr();
 	curs_set(0);
+	WINDOW* info = newwin(8,70,9,28);
+	refresh();
+	box(info,0,0);
+	mvwprintw(info,1,1,"El juego consiste en que los asteroides no choquen con la nave.");
+	mvwprintw(info,2,1,"Para mover la nave usa las fleclas");;
+	mvwprintw(info,3,1,"Hay 10 niveles distintos");
+	mvwprintw(info,5,1,"El juego esta a punto de empezar...");
+	wrefresh(info);
+
+	mciSendString("play song.mp3 repeat", NULL, 0, NULL);
+
+	werase(info);
+	wrefresh(info);
 	move(1,3);
 	printw("Bienvenido: MODO SUPERVIVENCIA");
 	move(2,57); 
@@ -211,7 +222,7 @@ int main(void)
     keypad(ventana, TRUE);
     nodelay(ventana, TRUE);
     start_color();
-    init_pair(1, COLOR_WHITE, COLOR_RED);
+    init_pair(1, COLOR_BLACK, COLOR_GREEN);
     wbkgd(ventana, COLOR_PAIR(1));
 
     Nave* nave = malloc(sizeof(Nave));
