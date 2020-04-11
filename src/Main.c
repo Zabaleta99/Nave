@@ -1,49 +1,43 @@
-#include "Usuario.h"
-#define numUsuarios 3
+#include "Usuarios.h"
+#include "Menus.h"
 #include <stdio.h>
 #include <stdlib.h>
+#define MAX 15
 
 int main(void)
 {
-	Usuario *arrayUsuarios;
-	arrayUsuarios = (Usuario*) malloc(numUsuarios * sizeof(Usuario));
-	
-	menu(arrayUsuarios, 5);
-	return 0;
-}
-
-void menu (Usuario *arrayUsuarios, int tamanyo)
-{
-	printf("\n1.- Iniciar sesion\n2.- Ver ranking\n3.- JUGAR\n\nQue opcion quieres?\n");
-	fflush(stdout);
-	char a;
-	scanf("%c", &a);
-	fflush(stdin);
-
-	switch (a)
+	FILE *file = fopen("Usuarios.txt", "r");
+	if (file == NULL)
 	{
-		//case '1': iniciarSesion(arrayUsuarios, tamanyo);
-		menu(arrayUsuarios, tamanyo);
-			break;
-		//case '2': verRanking(arrayUsuarios, tamanyo);
-		menu(arrayUsuarios, tamanyo);
-			break;
-		//case '3': jugar();
-		menu(arrayUsuarios, tamanyo);
-			break;
-		case 'q':
-
-			for(int i = 0; i<tamanyo;i++)
-			{
-				free(arrayUsuarios[i].nombre);   
-				free(arrayUsuarios[i].nickname);
-				free(arrayUsuarios[i].apellido);
-				free(arrayUsuarios[i].puntuaciones);
-			}
-			free(arrayUsuarios);
-			arrayUsuarios = NULL;
-			printf("Salida exitosa");
-			break;
-		default: printf("Introduce 1,2,3 o q\n");
+		printf("Error al abrir el fichero Usuarios.txt\n");
+		fflush(stdout);
+		return -1;
 	}
+	int *size = malloc(sizeof(int));
+
+	Usuario * arrayUsers;
+	arrayUsers = leerUsuarios(file, size);
+
+	for (int i=0; i<*size; i++)
+	{
+		printf("Nombre: %s   Contra: %s\n", (arrayUsers+i)->nickname, (arrayUsers+i)->contrasenya);
+		fflush(stdout);
+	}
+	
+
+	
+
+	int opcion = menuInicio();
+
+	if (opcion == 0)
+	{
+		//iniciar sesion
+	}
+
+	if (opcion == 1)
+	{
+		//registrarse
+	}
+
+	return 0;
 }
