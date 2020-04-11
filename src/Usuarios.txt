@@ -1,4 +1,10 @@
-3
-jon99;zaba
+9
+jon;zaba
 amaiur13;remi
 pol;fer
+juan;cendo
+javi;goros
+ane;bollo
+amaia;Zarranz
+hola;adios
+aritz;sistiaga

@@ -12,7 +12,7 @@ typedef struct
 
 
 Usuario * leerUsuarios (FILE *file, int *size);
-
+void escribirUsuarios(Usuario *usuarios, int size);
 
 
 #endif

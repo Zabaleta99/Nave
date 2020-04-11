@@ -9,6 +9,7 @@ void vaciar (char aux []);
 Usuario * leerUsuarios (FILE *file, int *size)
 {
 	char aux[MAX];
+	vaciar(aux);
 	char c = '\0';
 
 	fgets(aux, MAX, file);
@@ -49,7 +50,36 @@ Usuario * leerUsuarios (FILE *file, int *size)
 		vaciar(aux);
 	}
 
+	fclose(file);
 	return arrayUsuarios;
+}
+
+void escribirUsuarios(Usuario *usuarios, int size)
+{
+	FILE *file = fopen("Usuarios.txt", "w");
+	if (file == NULL)
+	{
+		printf("Error al abrir el fichero Usuarios.txt\n");
+		fflush(stdout);
+		exit(-1);
+	}
+
+	fprintf(file, "%d\n", size);
+
+	for (int i=0; i<size; i++)
+	{
+		if (i == size-1)
+		{
+			fprintf(file, "%s;%s", usuarios[i].nickname, usuarios[i].contrasenya);
+		}
+
+		else
+		{
+			fprintf(file, "%s;%s\n", usuarios[i].nickname, usuarios[i].contrasenya);
+		}
+	}
+
+	fclose(file);
 }
 
 void vaciar (char aux [])
