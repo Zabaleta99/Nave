@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #define ALTO 2
-#define IZQUIERDA 1
+#define IZQUIERDA 2
 #define BAJO 19
 #define DERECHA 95
 #define MAX_AST 10
@@ -14,12 +14,14 @@ typedef struct
 {
 	int x;
 	int y;
+	int vidas;
 } Nave;
 
 typedef struct 
 {
 	int x;
 	int y;
+	int tipo;
 } Asteroide;
 
 void mostrarNivel(int* num_ast)
@@ -39,6 +41,7 @@ void subirNivel(Asteroide* asteroides, int* num_ast)
 	{
 		asteroides[*num_ast].x = IZQUIERDA;
 		asteroides[*num_ast].y = (rand()%(BAJO-ALTO+1)) + ALTO;
+		asteroides[*num_ast].tipo = 1;
 		(*num_ast)++;
 
 		mostrarNivel(num_ast);
@@ -60,18 +63,19 @@ void pintarNaveChoque(WINDOW* ventana, Nave* nave)
 	wmove(ventana, nave->y, nave->x); wprintw(ventana, "\"\"\"\"");
 	wmove(ventana, nave->y-1, nave->x+1); wprintw(ventana, "\"\"");
 	wrefresh(ventana);
+	Sleep(500);
 }
 
-int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide)
+void nuevoAsteroideVertical(Asteroide* asteroide)
 {
-	if((asteroide->x >= nave->x) && (asteroide->x <= nave->x+3) && (asteroide->y >= nave->y-1) && (asteroide->y <= nave->y))
-	{
-		pintarNaveChoque(ventana, nave);
-		gameOver();
-		return 1;
-	}
-	else
-		return 0;
+	asteroide->x = (rand()%(DERECHA-IZQUIERDA+1)) + IZQUIERDA;
+	asteroide->y = ALTO;
+}
+
+void nuevoAsteroideHorizontal(Asteroide* asteroide)
+{
+	asteroide->y = (rand()%(BAJO-ALTO+1)) + ALTO;
+	asteroide->x = IZQUIERDA;
 }
 
 void pintarAsteroideVertical(WINDOW* ventana, Asteroide* asteroide)
@@ -82,8 +86,7 @@ void pintarAsteroideVertical(WINDOW* ventana, Asteroide* asteroide)
 
 	if(asteroide->y == BAJO)
 	{
-		asteroide->x = (rand()%(DERECHA-IZQUIERDA+1)) + IZQUIERDA;
-		asteroide->y = ALTO;
+		nuevoAsteroideVertical(asteroide);
 	}
 }
 
@@ -93,11 +96,29 @@ void pintarAsteroideHorizontal(WINDOW* ventana, Asteroide* asteroide)
 
 	asteroide->x++;
 
-	if(asteroide->x == DERECHA)
+	if(asteroide->x == DERECHA+2)
 	{
-		asteroide->y = (rand()%(BAJO-ALTO+1)) + ALTO;
-		asteroide->x = IZQUIERDA;
+		nuevoAsteroideHorizontal(asteroide);
 	}
+}
+
+int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide)
+{
+	if((asteroide->x >= nave->x) && (asteroide->x <= nave->x+3) && (asteroide->y >= nave->y-1) && (asteroide->y <= nave->y))
+	{
+		nave->vidas--;
+		if(asteroide->tipo == 0)
+		{
+			nuevoAsteroideVertical(asteroide);
+		}
+		else
+		{
+			nuevoAsteroideHorizontal(asteroide);
+		}
+		return 1;
+	}
+	else
+		return 0;
 }
 
 void actualizar(WINDOW* ventana)
@@ -174,7 +195,7 @@ int main(void)
 	curs_set(0);
 	move(1,3);
 	printw("Bienvenido: MODO SUPERVIVENCIA");
-    WINDOW* ventana = newwin(BAJO+2, DERECHA+5, 3, 9);
+    WINDOW* ventana = newwin(BAJO+2, DERECHA+6, 3, 9);
 
     refresh();
 
@@ -184,35 +205,37 @@ int main(void)
     init_pair(1, COLOR_WHITE, COLOR_RED);
     wbkgd(ventana, COLOR_PAIR(1));
 
+    Nave* nave = malloc(sizeof(Nave));
+    Asteroide* asteroides = malloc(MAX_AST * sizeof(Asteroide));
+
+    int* num_ast = malloc(sizeof(int));
+    float segundos = 0;
+    
+    int aux = 0;
+    int tecla;
+
     while(1)
     {
-	    Nave* nave = malloc(sizeof(Nave));
-	    nave->x = 50;
-	    nave->y = 19;
+    	nave->x = 50;
+    	nave->y = 19;
+    	nave->vidas = 3;
 
-	    Asteroide* asteroides = malloc(MAX_AST * sizeof(Asteroide));
+    	asteroides[0].x = 25;
+   		asteroides[0].y = ALTO;
+   		asteroides[0].tipo = 0;
 
-	    int* num_ast = malloc(sizeof(int));
-	    *num_ast = 1;
-	    float segundos = 0;
+   		*num_ast = 1;
 
-	    Asteroide* asteroide1 = malloc(sizeof(Asteroide));
-	    asteroides[0].x = 25;
-	    asteroides[0].y = ALTO;
+   		mostrarNivel(num_ast);
 
-	    mostrarNivel(num_ast);
-	    
 	    while(1)
 	    {
-	    	
 	        actualizar(ventana);
 	        if(segundos > 15)
 	        {
 	        	subirNivel(asteroides, num_ast);
 	        	segundos = 0;
 	        }
-
-	        int aux = 0;
 	        for(int i=0; i<*num_ast; i++)
 	        {
 	        	if(choque(ventana, nave, &asteroides[i]))
@@ -221,30 +244,29 @@ int main(void)
 	        		break;	
 	        	}
 	        }
-
-	        if(aux == 1)
+	        if(aux == 0)
+	        	pintarNave(ventana, nave);
+	        else
 	        {
-	        	break;
-	        }
-
-	        for(int i=0; i<*num_ast; i++)
-	        {
-	        	if(i==0)
-	        	{
-	        		pintarAsteroideVertical(ventana, &asteroides[i]);
-	        	}
-	        	else
-	        	{
-	        		pintarAsteroideHorizontal(ventana, &asteroides[i]);
-	        	}
+	        	aux = 0;
+	        	pintarNaveChoque(ventana, nave);
 	        }
 	        
-	        pintarNave(ventana, nave);
-	          							
+	        if(nave->vidas == 0)
+	        {
+	        	gameOver();
+	        	break;
+	        }
+	       
+	        for(int i=0; i<*num_ast; i++)
+	        {
+	        	if(asteroides[i].tipo == 0)
+	        		pintarAsteroideVertical(ventana, &asteroides[i]);
+	        	else
+	        		pintarAsteroideHorizontal(ventana, &asteroides[i]);
+	        }							
 	        wrefresh(ventana);
-
-	        int tecla = wgetch(ventana);
-
+	        tecla = wgetch(ventana);
 	        switch(tecla)
 	        {
 	            case KEY_UP:
@@ -277,12 +299,17 @@ int main(void)
 	        Sleep(35);
 	        segundos +=0.035;
 	    }
-
-	    if(menuSalida() == 1)
+	    if(menuSalida())
     		break;
+    	segundos = 0;
+    	for(int i=1; i<*num_ast; i++)
+    	{
+    		asteroides[i].x = 0;
+    		asteroides[i].y = 0;
+    		asteroides[i].tipo = 0;
+    	}
+    	*num_ast = 1;
     }
-    
 	endwin();
-
     return 0;
 }
