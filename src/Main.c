@@ -40,7 +40,24 @@ void menuMain()
 	if (opcion == 0)
 	{
 		user = menuIniciarSesion(arrayUsers, *size);
-		//SEGUIR AQUI, HACER MENU DEL USUARIO INICIADO
+		int selected = menuPlayer(user);
+
+		if (selected == 1)
+		{
+
+		}
+		else if (selected == 2)
+		{
+
+		}
+		else if (selected == 3)
+		{
+
+		}
+		else if (selected == 4)
+		{
+			menuMain();
+		}
 	}
 
 	if (opcion == 1)

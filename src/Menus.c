@@ -176,11 +176,6 @@ Usuario * menuIniciarSesion(Usuario *usuarios, int size)
     }
 }
 
-void menuPlayer (Usuario *player)
-{
-
-}
-
 void menuRegistrarse (Usuario *usuarios, int size)
 {
     Usuario *usuariosActualizados;
@@ -325,6 +320,74 @@ void menuRegistrarse (Usuario *usuarios, int size)
 
         menuMain();
     }
+}
+
+int menuPlayer (Usuario *usuario)
+{
+    curs_set(0);
+    WINDOW* player = newwin(8,100,10,9);
+    move(9, 42);
+    start_color();
+    init_pair(3, COLOR_WHITE, COLOR_RED);
+    attron(COLOR_PAIR(3));
+    printw("    BIENVENIDO %s    ", usuario->nickname);
+    attroff(COLOR_PAIR(3));
+    
+    refresh();
+    box(player,0,0);
+    keypad(player, TRUE);
+
+    char** opciones = malloc(5 * sizeof(char*));
+    for(int i=0; i<5; i++)
+    {
+        opciones[i] = malloc(MAX * sizeof(char));
+    }
+    opciones[0] = "SUPERVIVENCIA";
+    opciones[1] = "CLASICO";
+    opciones[2] = "RANKING CLASICO";
+    opciones[3] = "MI CUENTA";
+    opciones[4] = "SALIR";
+
+    int eleccion;
+    int seleccion = 0;
+
+    while(1)
+    {
+        for(int i=0; i<5; i++)
+        {
+            if(i==seleccion)
+                wattron(player, A_REVERSE);
+            mvwprintw(player, i+1, 1, "%s", opciones[i]);
+            wattroff(player, A_REVERSE);
+        }
+        wrefresh(player);
+
+        eleccion = wgetch(player);
+
+        switch(eleccion)
+        {
+            case KEY_UP:
+                seleccion--;
+                if(seleccion == -1)
+                    seleccion = 0;
+                break;
+            case KEY_DOWN:
+                seleccion++;
+                if(seleccion == 5)
+                    seleccion = 4;
+                break;
+            default:
+                break;
+        }
+        if(eleccion == 10)
+            break;
+    }
+    werase(player);
+    erase();
+    refresh();
+    wrefresh(player);
+
+    return seleccion;
 }
 
 
