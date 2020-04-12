@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define ALTO 2
+#define ALTO 3
 #define IZQUIERDA 2
 #define BAJO 19
 #define DERECHA 95
@@ -67,7 +67,7 @@ void pintarNaveChoque(WINDOW* ventana, Nave* nave)
 void nuevoAsteroideVertical(Asteroide* asteroide)
 {
 	asteroide->x = (rand()%(DERECHA-IZQUIERDA+1)) + IZQUIERDA;
-	asteroide->y = ALTO-2;
+	asteroide->y = ALTO-3;
 }
 
 void nuevoAsteroideHorizontal(Asteroide* asteroide)
@@ -140,6 +140,7 @@ void pintarNave(WINDOW* ventana, Nave* nave)
 
 int menuSalida(void)
 {
+	mciSendString("pause song.mp3", NULL, 0, NULL);
 	WINDOW* salida = newwin(5,100,24,9);
     refresh();
     box(salida,0,0);
@@ -236,6 +237,7 @@ int main(void)
 
     while(1)
     {
+    	mciSendString("play song.mp3 repeat", NULL, 0, NULL);
     	nave->x = 50;
     	nave->y = 19;
     	nave->vidas = 3;
@@ -279,10 +281,14 @@ int main(void)
 				pintarNaveChoque(ventana, nave);
 	        						
 	        wrefresh(ventana);
-	        if(aux == 1) Sleep(500);
-
+	        if(aux == 1) 
+	        {
+	        	Beep(500,800);
+	        	Sleep(100);
+			}
 	        if(nave->vidas == 0)
 	        {
+	        	aux = 0;
 	        	gameOver();
 	        	break;
 	        }	
