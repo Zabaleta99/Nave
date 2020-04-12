@@ -185,6 +185,22 @@ int main(void)
 {
     initscr();
 	curs_set(0);
+
+	WINDOW* info = newwin(8,70,9,28);
+	refresh();
+	box(info,0,0);
+	mvwprintw(info,1,1,"El juego consiste en que los asteroides no choquen con la nave.");
+	mvwprintw(info,2,1,"Para mover la nave usa las flechas, y para diparar el espacio.");;
+	mvwprintw(info,3,1,"Tu puntuacion dependera de la duracion de la partida y de los");
+	mvwprintw(info,4,1,"asteroides abatidos. Buena suerte!");
+	mvwprintw(info,5,1,"El juego esta a punto de empezar...");
+	wrefresh(info);
+
+	mciSendString("play song.mp3 repeat", NULL, 0, NULL);
+
+	werase(info);
+	wrefresh(info);
+
 	move(1,3);
 	printw("Bienvenido: MODO CLASICO");	    
 	move(2,50); 
