@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define ALTO 2
-#define IZQUIERDA 1
+#define ALTO 3
+#define IZQUIERDA 2
 #define BAJO 19
 #define DERECHA 95
 #define MAX_AST 5
 #define MAX_LENGHT 15
+#define MAX_BALAS 100
 
 typedef struct 
 {
@@ -24,6 +25,12 @@ typedef struct
 	int y;
 } Asteroide;
 
+typedef struct 
+{
+	int x;
+	int y;
+}Bala;
+
 void subirNivel(Asteroide* asteroides, int* num_ast)
 {
 	if(*num_ast <= MAX_AST)
@@ -31,6 +38,16 @@ void subirNivel(Asteroide* asteroides, int* num_ast)
 		asteroides[*num_ast].x = (rand()%(DERECHA-IZQUIERDA+1)) + IZQUIERDA;
 		asteroides[*num_ast].y = ALTO;
 		(*num_ast)++;
+	}
+}
+
+void crearBala (Bala* balas, Nave* nave, int* numBala)
+{
+	if (*numBala <= MAX_BALAS)
+	{
+		balas[*numBala].x = (nave->x+2);
+		balas[*numBala].y = (nave->y-2);
+		(*numBala)++;
 	}
 }
 
@@ -71,14 +88,40 @@ void pintarNaveChoque(WINDOW* ventana, Nave* nave)
 
 }
 
+void pintarChoqueAsteroideBala (WINDOW* ventana, Bala* bala)
+{
+	wmove(ventana, bala->y, bala->x); wprintw(ventana, "#");
+	wmove(ventana, bala->y+1, bala->x); wprintw(ventana, "#");
+	wmove(ventana, bala->y-1, bala->x); wprintw(ventana, "#");
+	bala->x = -1;
+	bala->y = -1;
+	wrefresh(ventana);
+}
+
 int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide)
 {
-	if((asteroide->x >= nave->x) && (asteroide->x <= nave->x+3) && (asteroide->y >= nave->y-1) && ((asteroide->y <= nave->y)) && (asteroide->x != nave->x) && (asteroide->x != nave->x+3))
+	if((asteroide->x >= nave->x) && (asteroide->x <= nave->x+4) && (asteroide->y >= nave->y-1) && (asteroide->y <= nave->y))
 	{
+		asteroide->x = -1;
+		asteroide->y = -1;
 		pintarNaveChoque(ventana, nave);
 		return 1;
 	}
 	else
+		return 0;
+}
+
+int choqueBalaAsteroide(WINDOW* ventana, Bala* bala, Asteroide* asteroide)
+{
+	if((bala->x == asteroide->x) && ((bala->y == asteroide->y+1) || (bala->y == asteroide->y)))
+	{
+		asteroide->x = -1;
+		asteroide->y = -1;
+		pintarChoqueAsteroideBala(ventana, bala);
+		return 1;
+	}
+	else
+	
 		return 0;
 }
 
@@ -95,6 +138,21 @@ void pintarAsteroideVertical(WINDOW* ventana, Asteroide* asteroide)
 	}
 }
 
+void pintarBala(WINDOW* ventana, Bala* bala)
+{
+	wmove(ventana, bala->y, bala->x);
+	if (bala->x != -1)
+		wprintw(ventana, "^");
+	
+	bala->y--;
+
+	if (bala->y == ALTO-2)
+	{
+		bala->x = -1;
+		bala->y = -1;
+	}
+}
+
 void actualizar(WINDOW* ventana)
 {
 	werase(ventana);
@@ -103,8 +161,8 @@ void actualizar(WINDOW* ventana)
 
 void pintarNave(WINDOW* ventana, Nave* nave)
 {
-	wmove(ventana, nave->y, nave->x); wprintw(ventana, "****");
-	wmove(ventana, nave->y-1, nave->x+1); wprintw(ventana, "**");
+	wmove(ventana, nave->y, nave->x); wprintw(ventana, "*****");
+	wmove(ventana, nave->y-1, nave->x+1); wprintw(ventana, "***");
 }
 
 int menuSalida(void)
@@ -169,6 +227,7 @@ void borrarVidas()
 	move(2,71); printw("      ");
 	refresh();
 }
+
 void pintarVidas(Nave* nave)
 {
 	move(2,57); printw("%i",nave->vidas);
@@ -207,12 +266,13 @@ int main(void)
 	printw("Vidas: ");
 	move(2,65); 
 	printw("Salud: ");
-    WINDOW* ventana = newwin(BAJO+2, DERECHA+5, 3, 9);
+    WINDOW* ventana = newwin(BAJO+2, DERECHA+6, 3, 9);
 
     refresh();
 
     keypad(ventana, TRUE);
     nodelay(ventana, TRUE);
+    noecho();
     start_color();
     init_pair(1, COLOR_WHITE, COLOR_RED);
     wbkgd(ventana, COLOR_PAIR(1));
@@ -233,12 +293,21 @@ int main(void)
 	    *num_ast = 1;
 	    float segundos = 0;
 	    float tiempo = 0;
-	    float disparos = 0;
+	    float disparosAcertados = 0;
 
 	    Asteroide* asteroide1 = malloc(sizeof(Asteroide));
 	    asteroides[0].x = 25;
 	    asteroides[0].y = ALTO;
+
+	    Bala* balas = malloc(MAX_BALAS * sizeof(Bala));
 	    
+	    balas[0].x = -1;
+	    balas[0].y = -1;
+	    
+	    int* numeroDeBala = malloc(sizeof(int));
+	    *numeroDeBala = 1;
+	    int contadorBala = 0;
+
 	    while(1)
 	    {
 	    	
@@ -250,11 +319,23 @@ int main(void)
 	        	segundos = 0;
 	        }
 
+	        //for para comprobar choques bala asteroide
+	        for (int i=0; i<*numeroDeBala; i++)
+	        {
+	        	if(choqueBalaAsteroide(ventana, &balas[*numeroDeBala-1], &asteroides[i]))
+	        	{
+	        		disparosAcertados++;
+	        	}
+	        }
+
 	        int aux = 0;
 	        for(int i=0; i<*num_ast; i++)
 	        {
 	        	if(choque(ventana, nave, &asteroides[i]))
 	        	{
+	        		pintarNaveChoque(ventana, nave);
+	        		Beep(500,800);
+	        		Sleep(500);
 	        		aux = 1;
 	        		break;	
 	        	}
@@ -274,11 +355,13 @@ int main(void)
 	        	if(nave->vidas == 0)
 	        	{
 	        		gameOver();
-	        		puntuacion(tiempo,disparos);
+	        		puntuacion(tiempo,disparosAcertados);
 	        		break;
 	        	}
 	        	
 	        }
+
+	        pintarBala(ventana, &balas[(*numeroDeBala)-1]);
 
 	        for(int i=0; i<*num_ast; i++)
 	        {
@@ -287,7 +370,6 @@ int main(void)
 	        }
 	        
 	        pintarNave(ventana, nave);
-	          							
 	        wrefresh(ventana);
 
 	        int tecla = wgetch(ventana);
@@ -308,7 +390,7 @@ int main(void)
 
 	            case KEY_RIGHT:
 
-	            	if(nave->x<DERECHA)
+	            	if(nave->x<DERECHA-1)
 	                	nave->x+=2;
 	                break;
 
@@ -318,11 +400,15 @@ int main(void)
 	                	nave->x-=2;
 	                break;
 
+	            case 32:
+	            	crearBala(balas, nave, numeroDeBala);
+	                break;
+
 	            default:
 	            	break;
 	        }
-	        Sleep(35);
-	        segundos +=0.035;
+	        Sleep(60);
+	        segundos +=0.060;
 	    }
 
 	    if(menuSalida() == 1)
