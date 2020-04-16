@@ -42,27 +42,31 @@ void menuMain()
 		user = menuIniciarSesion(arrayUsers, *size);
 		int selected = menuPlayer(user);
 
-		if (selected == 0)
+		while (selected != 4)
 		{
 
-		}
-		else if (selected == 1)
-		{
-			//jugarClasico();
-			menuPlayer(user)
-		}
-		else if (selected == 2)
-		{
+			if (selected == 0)
+			{
 
-		}
-		else if (selected == 3)
-		{
-			
-		}
+			}
+			else if (selected == 1)
+			{
+				jugarClasico();
+				selected = menuPlayer(user);
+			}
+			else if (selected == 2)
+			{
 
-		else if (selected == 4)
-		{
-			menuMain();
+			}
+			else if (selected == 3)
+			{
+				
+			}
+
+			else if (selected == 4)
+			{
+				menuMain();
+			}
 		}
 	}
 
