@@ -4,31 +4,15 @@
 #include <unistd.h>
 #include "Clasico.h"
 
-#define ALTO 3
-#define IZQUIERDA 2
-#define BAJO 23
-#define DERECHA 95
-#define MAX_AST 10
-#define MAX_LENGHT 15
-#define MAX_BALAS 100
-
-void subirNivel(Asteroide* asteroides, int* num_ast)
-{
-	if(*num_ast <= MAX_AST)
-	{
-		asteroides[*num_ast].x = (rand()%(DERECHA-IZQUIERDA+1)) + IZQUIERDA;
-		asteroides[*num_ast].y = ALTO-3;
-		(*num_ast)++;
-	}
-}
-
-void crearBala (Bala* balas, Nave* nave, int* num_balas)
+void crearBalas (Bala* balas, Nave* nave, int* num_balas)
 {
 	if (*num_balas < MAX_BALAS)
 	{
-		balas[*num_balas].x = (nave->x+2);
-		balas[*num_balas].y = (nave->y-2);
-		(*num_balas)++;
+		balas[*num_balas].x = nave->x+1;
+		balas[*num_balas].y = nave->y-2;
+		balas[*num_balas+1].x = nave->x+2;
+		balas[*num_balas+1].y = nave->y-2;
+		*num_balas += 2;
 	}
 }
 
@@ -65,8 +49,8 @@ WINDOW* mostrarPuntuacion (float tiempo, int* disparosAcertados)
 
 void pintarNaveChoque(WINDOW* ventana, Nave* nave)
 {
-	wmove(ventana, nave->y, nave->x); wprintw(ventana, "\"\"\"\"\"");
-	wmove(ventana, nave->y-1, nave->x+1); wprintw(ventana, "\"\"\"");
+	wmove(ventana, nave->y, nave->x); wprintw(ventana, "\"\"\"\"");
+	wmove(ventana, nave->y-1, nave->x+1); wprintw(ventana, "\"\"");
 
 }
 
@@ -77,7 +61,13 @@ void pintarChoqueAsteroideBala (WINDOW* ventana, Bala* bala)
 	bala->y = -1;
 }
 
-void pintarNuevoAsteroide(Asteroide* asteroide)
+void nuevoAsteroideHorizontal(Asteroide* asteroide)
+{
+	asteroide->x = IZQUIERDA-2;
+	asteroide->y = (rand()%(BAJO-ALTO+1)) + ALTO;
+}
+
+void nuevoAsteroideVertical(Asteroide* asteroide)
 {
 	asteroide->x = (rand()%(DERECHA-IZQUIERDA+1)) + IZQUIERDA;
 	asteroide->y = ALTO-3;
@@ -85,10 +75,17 @@ void pintarNuevoAsteroide(Asteroide* asteroide)
 
 int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide)
 {
-	if((asteroide->x >= nave->x) && (asteroide->x <= nave->x+4) && (asteroide->y >= nave->y-1) && (asteroide->y <= nave->y))
+	if((asteroide->x >= nave->x) && (asteroide->x <= nave->x+3) && (asteroide->y >= nave->y-1) && (asteroide->y <= nave->y))
 	{
 		nave->corazones--;
-		pintarNuevoAsteroide(asteroide);
+		if(asteroide->tipo == 0)
+		{
+			nuevoAsteroideVertical(asteroide);
+		}
+		else
+		{
+			nuevoAsteroideHorizontal(asteroide);
+		}
 		return 1;
 	}
 	else
@@ -97,9 +94,16 @@ int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide)
 
 int choqueBalaAsteroide(WINDOW* ventana, Bala* bala, Asteroide* asteroide, int* disparosAcertados)
 {
-	if((bala->x == asteroide->x) && ((bala->y == asteroide->y+1) || (bala->y == asteroide->y)))
+	if((bala->x == asteroide->x) && ((bala->y == asteroide->y+1) || (bala->y == asteroide->y)) || (bala->x+1 == asteroide->x) && ((bala->y == asteroide->y+1) || (bala->y == asteroide->y)))
 	{
-		pintarNuevoAsteroide(asteroide);
+		if(asteroide->tipo == 0)
+		{
+			nuevoAsteroideVertical(asteroide);
+		}
+		else
+		{
+			nuevoAsteroideHorizontal(asteroide);
+		}
 		pintarChoqueAsteroideBala(ventana, bala);
 		(*disparosAcertados)++;
 		return 1;
@@ -109,15 +113,27 @@ int choqueBalaAsteroide(WINDOW* ventana, Bala* bala, Asteroide* asteroide, int* 
 		return 0;
 }
 
+void pintarAsteroideHorizontal(WINDOW* ventana, Asteroide* asteroide)
+{
+	wmove(ventana, asteroide->y, asteroide->x); wprintw(ventana, "O");
+
+	asteroide->x++;
+
+	if(asteroide->x == DERECHA+1)
+	{
+		nuevoAsteroideHorizontal(asteroide);
+	}
+}
+
 void pintarAsteroideVertical(WINDOW* ventana, Asteroide* asteroide)
 {
 	wmove(ventana, asteroide->y, asteroide->x); wprintw(ventana, "O");
 
 	asteroide->y++;
 
-	if(asteroide->y == BAJO+2)
+	if(asteroide->y == BAJO+1)
 	{
-		pintarNuevoAsteroide(asteroide);
+		nuevoAsteroideVertical(asteroide);
 	}
 }
 
@@ -134,10 +150,21 @@ void pintarBala(WINDOW* ventana, Bala* bala)
 	}
 }
 
+void pintarAsteroides(WINDOW* ventana, Asteroide* asteroides, int* num_ast)
+{
+	for(int i=0; i<*num_ast; i++)
+    {
+    	if(asteroides[i].tipo == 0)
+    		pintarAsteroideVertical(ventana, &asteroides[i]);
+    	else
+    		pintarAsteroideHorizontal(ventana, &asteroides[i]);
+    }
+}
+
 void pintarNave(WINDOW* ventana, Nave* nave)
 {
-	wmove(ventana, nave->y, nave->x); wprintw(ventana, "*****");
-	wmove(ventana, nave->y-1, nave->x+1); wprintw(ventana, "***");
+	wmove(ventana, nave->y, nave->x); wprintw(ventana, "****");
+	wmove(ventana, nave->y-1, nave->x+1); wprintw(ventana, "**");
 }
 
 int menuSalida(void)
@@ -211,8 +238,8 @@ void pintarVidas(Nave* nave)
 
 void actualizarDisparosAcertados (int* disparosAcertados, int* num_balas)
 {
-	move(2, 65);
-	printw("Disparos Acertados: %d", *disparosAcertados);
+	mvprintw(2, 86, "  ");
+	mvprintw(2, 65, "Disparos Acertados: %d", *disparosAcertados);
 	
 	mvprintw(2, 107, "  ");
 	mvprintw(2, 95, "Restantes: %d", (MAX_BALAS-*num_balas));
@@ -227,6 +254,36 @@ void actualizar(WINDOW* ventana, Nave* nave, int* disparosAcertados, int* num_ba
 	box(ventana, 0,0);
 }
 
+void crearAsteroidesHorizontales(Asteroide* asteroides, int* num_ast)
+{
+	int contador = 0;
+	while(contador != 2)
+	{
+		nuevoAsteroideHorizontal(&asteroides[*num_ast]);
+		asteroides[*num_ast].tipo = 1;
+		(*num_ast)++;
+		contador++;
+	}
+}
+
+void crearAsteroidesVerticales(Asteroide* asteroides, int* num_ast)
+{
+	int contador = 0;
+	while(contador != 3)
+	{
+		nuevoAsteroideVertical(&asteroides[*num_ast]);
+		asteroides[*num_ast].tipo = 0;
+		(*num_ast)++;
+		contador++;
+	}
+}
+
+void subirNivel(Asteroide* asteroides, int* num_ast)
+{
+	crearAsteroidesVerticales(asteroides, num_ast);
+	crearAsteroidesHorizontales(asteroides, num_ast);
+}
+
 void inicializarParametros(Nave* nave, Asteroide* asteroides, int* num_ast, int* num_balas, int* disparosAcertados)
 {
     nave->x = 50;
@@ -234,10 +291,13 @@ void inicializarParametros(Nave* nave, Asteroide* asteroides, int* num_ast, int*
     nave->corazones = 3;
     nave->vidas = 3;
 
-    asteroides[0].x = 25;
-	asteroides[0].y = ALTO;
+    for(int i=0; i<5; i++)
+    {
+    	nuevoAsteroideVertical(&asteroides[i]);
+    	asteroides[i].tipo = 0;
+    }
 
-	*num_ast = 1;
+	*num_ast = 5;
 	*num_balas = 0;
 	*disparosAcertados = 0;
 }
@@ -302,7 +362,7 @@ void reestablecerValores(int segundos, int tiempo, Asteroide* asteroides, int* n
 {
 	segundos = 0;
 	tiempo = 0;
-	for(int i=1; i<*num_ast; i++)
+	for(int i=0; i<*num_ast; i++)
 	{
 		asteroides[i].x = 0;
 		asteroides[i].y = 0;
@@ -346,7 +406,7 @@ void movimientosJugador(int tecla, Nave* nave, Bala* balas, int* num_balas)
             break;
 
         case 32:
-        	crearBala(balas, nave, num_balas);
+        	crearBalas(balas, nave, num_balas);
             break;
 
         default:
@@ -405,7 +465,7 @@ void jugarClasico(void)
 	    {
 	        actualizar(ventana, nave, disparosAcertados, num_balas);
 
-	        if(segundos > 15)
+	        if(segundos > 30)
 	        {
 	        	subirNivel(asteroides, num_ast);
 	        	tiempo += segundos;
@@ -436,11 +496,7 @@ void jugarClasico(void)
 	        	pintarBala(ventana, &balas[i]);
 	        }
 
-	        for(int i=0; i<*num_ast; i++)
-	        {
-	        	
-	        	pintarAsteroideVertical(ventana, &asteroides[i]);
-	        }
+	        pintarAsteroides(ventana, asteroides, num_ast);
 	        
 	        if(!choqueAsteroide)
 	        	pintarNave(ventana, nave);
@@ -452,12 +508,10 @@ void jugarClasico(void)
 	        if(choqueAsteroide)
 	        {
 	        	Beep(500,800);
-	        	Sleep(100);
 	        }
 	        if(choqueBala)
 	        {
-	        	Beep(800,200);
-	        	Sleep(100);
+	        	Beep(800,50);
 	        }
 
 	        if(nave->corazones == 0)

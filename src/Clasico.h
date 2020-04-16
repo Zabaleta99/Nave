@@ -2,18 +2,14 @@
 #define _OPERACIONES_H_
 
 #include <curses.h>
-#include <windows.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include "Clasico.h"
 
 #define ALTO 3
 #define IZQUIERDA 2
 #define BAJO 23
 #define DERECHA 95
-#define MAX_AST 10
+#define MAX_AST 20
 #define MAX_LENGHT 15
-#define MAX_BALAS 100
+#define MAX_BALAS 200
 
 typedef struct 
 {
@@ -27,6 +23,7 @@ typedef struct
 {
 	int x;
 	int y;
+	int tipo;
 } Asteroide;
 
 typedef struct 
@@ -51,7 +48,9 @@ void pintarNaveChoque(WINDOW* ventana, Nave* nave);
 
 void pintarChoqueAsteroideBala (WINDOW* ventana, Bala* bala);
 
-void pintarNuevoAsteroide(Asteroide* asteroide);
+void nuevoAsteroideVertical(Asteroide* asteroide);
+
+void nuevoAsteroideHorizontal(Asteroide* asteroide);
 
 int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide);
 

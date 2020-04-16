@@ -93,8 +93,8 @@ void nuevoAsteroideVertical(Asteroide* asteroide)
 
 void nuevoAsteroideHorizontal(Asteroide* asteroide)
 {
-	asteroide->y = (rand()%(BAJO-ALTO+1)) + ALTO;
 	asteroide->x = IZQUIERDA-2;
+	asteroide->y = (rand()%(BAJO-ALTO+1)) + ALTO;
 }
 
 void pintarAsteroideVertical(WINDOW* ventana, Asteroide* asteroide)
