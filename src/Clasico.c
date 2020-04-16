@@ -5,11 +5,11 @@
 
 #define ALTO 3
 #define IZQUIERDA 2
-#define BAJO 19
+#define BAJO 23
 #define DERECHA 95
 #define MAX_AST 5
 #define MAX_LENGHT 15
-#define MAX_BALAS 100
+#define MAX_BALAS 50
 
 typedef struct 
 {
@@ -43,7 +43,7 @@ void subirNivel(Asteroide* asteroides, int* num_ast)
 
 void crearBala (Bala* balas, Nave* nave, int* numBala)
 {
-	if (*numBala <= MAX_BALAS)
+	if (*numBala < MAX_BALAS)
 	{
 		balas[*numBala].x = (nave->x+2);
 		balas[*numBala].y = (nave->y-2);
@@ -143,7 +143,7 @@ void pintarBala(WINDOW* ventana, Bala* bala)
 	wmove(ventana, bala->y, bala->x);
 	if (bala->x != -1)
 		wprintw(ventana, "^");
-	
+
 	bala->y--;
 
 	if (bala->y == ALTO-2)
@@ -223,20 +223,30 @@ int menuSalida(void)
 
 void borrarVidas()
 {
-	move(2,57); printw("    ");
-	move(2,71); printw("      ");
+	move(2,38); printw("    ");
+	move(2,53); printw("      ");
 	refresh();
 }
 
 void pintarVidas(Nave* nave)
 {
-	move(2,57); printw("%i",nave->vidas);
+	move(2,38); printw("%i",nave->vidas);
 	 
 	for(int i=0; i<nave->corazones;i++)
 	{
-		move(2,71+i);
+		move(2,53+i);
 		printw("O");
 	}
+	refresh();
+}
+
+void actualizarDisparosAcertados (int disparosAcertados, int* numeroDeBala)
+{
+	move(2, 65);
+	printw("Disparos Acertados: %d", disparosAcertados);
+	
+	move(2, 95);
+	printw("Restantes: %d", (MAX_BALAS-*numeroDeBala));
 	refresh();
 }
 
@@ -262,10 +272,11 @@ int main(void)
 
 	move(1,3);
 	printw("Bienvenido: MODO CLASICO");	    
-	move(2,50); 
+	move(2,30); 
 	printw("Vidas: ");
-	move(2,65); 
+	move(2,45); 
 	printw("Salud: ");
+
     WINDOW* ventana = newwin(BAJO+2, DERECHA+6, 3, 9);
 
     refresh();
@@ -293,7 +304,7 @@ int main(void)
 	    *num_ast = 1;
 	    float segundos = 0;
 	    float tiempo = 0;
-	    float disparosAcertados = 0;
+	    int disparosAcertados = 0;
 
 	    Asteroide* asteroide1 = malloc(sizeof(Asteroide));
 	    asteroides[0].x = 25;
@@ -305,13 +316,15 @@ int main(void)
 	    balas[0].y = -1;
 	    
 	    int* numeroDeBala = malloc(sizeof(int));
-	    *numeroDeBala = 1;
+	    *numeroDeBala = 0;
 	    int contadorBala = 0;
 
 	    while(1)
 	    {
-	    	
 	        actualizar(ventana);
+
+	   		actualizarDisparosAcertados(disparosAcertados, numeroDeBala);
+
 	        if(segundos > 15)
 	        {
 	        	subirNivel(asteroides, num_ast);
@@ -319,13 +332,17 @@ int main(void)
 	        	segundos = 0;
 	        }
 
-	        //for para comprobar choques bala asteroide
-	        for (int i=0; i<*numeroDeBala; i++)
+	        for (int i=0; i<*num_ast; i++)
 	        {
-	        	if(choqueBalaAsteroide(ventana, &balas[*numeroDeBala-1], &asteroides[i]))
+	        	for (int j=0; j<*numeroDeBala; j++)
 	        	{
-	        		disparosAcertados++;
+					if(choqueBalaAsteroide(ventana, &balas[j], &asteroides[i]))
+	        		{
+	        			disparosAcertados++;
+	        		}
+
 	        	}
+	        	
 	        }
 
 	        int aux = 0;
@@ -361,7 +378,11 @@ int main(void)
 	        	
 	        }
 
-	        pintarBala(ventana, &balas[(*numeroDeBala)-1]);
+	        for (int i=0; i<*numeroDeBala; i++)
+	        {
+	        	pintarBala(ventana, &balas[i]);
+	        }
+	       	
 
 	        for(int i=0; i<*num_ast; i++)
 	        {
@@ -407,8 +428,8 @@ int main(void)
 	            default:
 	            	break;
 	        }
-	        Sleep(60);
-	        segundos +=0.060;
+	        Sleep(50);
+	        segundos +=0.050;
 	    }
 
 	    if(menuSalida() == 1)

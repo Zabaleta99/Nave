@@ -42,9 +42,14 @@ void menuMain()
 		user = menuIniciarSesion(arrayUsers, *size);
 		int selected = menuPlayer(user);
 
-		if (selected == 1)
+		if (selected == 0)
 		{
 
+		}
+		else if (selected == 1)
+		{
+			//jugarClasico();
+			menuPlayer(user)
 		}
 		else if (selected == 2)
 		{
@@ -52,8 +57,9 @@ void menuMain()
 		}
 		else if (selected == 3)
 		{
-
+			
 		}
+
 		else if (selected == 4)
 		{
 			menuMain();
