@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include "Supervivencia.h"
 #define ALTO 3
 #define IZQUIERDA 2
 #define BAJO 19
@@ -11,25 +11,7 @@
 #define MAX_EXTRA 5
 #define MAX_LENGHT 15
 
-typedef struct 
-{
-	int x;
-	int y;
-	int vidas;
-} Nave;
 
-typedef struct 
-{
-	int x;
-	int y;
-	int tipo;
-} Asteroide;
-
-typedef struct
-{
-	int x;
-	int y;
-} VidaExtra;
 
 void mostrarNivel(int* num_ast)
 {
@@ -277,6 +259,7 @@ WINDOW* mostrarJuego(void)
     refresh();
     keypad(ventana, TRUE);
     nodelay(ventana, TRUE);
+    noecho();
     start_color();
     init_pair(1, COLOR_BLACK, COLOR_GREEN);
     wbkgd(ventana, COLOR_PAIR(1));
@@ -336,7 +319,7 @@ void pintarAsteroides(WINDOW* ventana, Asteroide* asteroides, int* num_ast)
     }
 }
 
-int main(void)
+void jugarSupervivencia (void)
 {
     initscr();
 	curs_set(0);
@@ -472,5 +455,4 @@ int main(void)
     }
     liberarMemoria(nave, asteroides, num_ast, vidasExtra, num_vidasExtra, ventana, gameOver);
 	endwin();
-    return 0;
 }

@@ -12,33 +12,39 @@ typedef struct
 	int y;
 	int vidas;
 	int corazones;
-} Nave;
+} NaveC;
 
 typedef struct 
 {
 	int x;
 	int y;
-} Asteroide;
+} AsteroideC;
+
+typedef struct 
+{
+	int x;
+	int y;
+}Bala;
 
 void jugarClasico();
-void subirNivelClasico(Asteroide* asteroides, int* num_ast);
+void subirNivelClasico(AsteroideC* asteroides, int* num_ast);
 void gameOver(WINDOW* gameOver);
 void puntuacionFinal (WINDOW* puntuacion, float tiempo, float disparos);
-void pintarNaveChoqueClasico(WINDOW* ventana, Nave* nave);
-int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide);
-void pintarAsteroideVerticalClasico(WINDOW* ventana, Asteroide* asteroide);
+void pintarNaveChoqueClasico(WINDOW* ventana, NaveC* nave);
+int choque(WINDOW* ventana, NaveC* nave, AsteroideC* asteroide);
+void pintarAsteroideVerticalClasico(WINDOW* ventana, AsteroideC* asteroide);
 void actualizarClasico(WINDOW* ventana);
-void pintarNaveClasico(WINDOW* ventana, Nave* nave);
+void pintarNaveClasico(WINDOW* ventana, NaveC* nave);
 int menuSalidaClasico(void);
 void borrarVidas();
-void pintarVidasClasico(Nave* nave);
+void pintarVidasClasico(NaveC* nave);
 void actualizarDisparosAcertados (int disparosAcertados, int* numeroDeBala);
 void infoClasico (WINDOW* info);
 void crearVentanaClasico (WINDOW* ventana);
 void pintarBala(WINDOW* ventana, Bala* bala);
-int choqueBalaAsteroide(WINDOW* ventana, Bala* bala, Asteroide* asteroide);
+int choqueBalaAsteroide(WINDOW* ventana, Bala* bala, AsteroideC* asteroide);
 void pintarChoqueAsteroideBala (WINDOW* ventana, Bala* bala);
-void crearBala (Bala* balas, Nave* nave, int* numBala);
-void liberarMemoriaClasico(Nave* nave, Asteroide* asteroides, Asteroide* asteroide1, Bala* balas, int* num_bala, int* num_ast, WINDOW* ventana, WINDOW* gameOver, WINDOW* puntuacionn);
+void crearBala (Bala* balas, NaveC* nave, int* numBala);
+void liberarMemoriaClasico(NaveC* nave, AsteroideC* asteroides, AsteroideC* asteroide1, Bala* balas, int* num_bala, int* num_ast, WINDOW* ventana, WINDOW* gameOver, WINDOW* puntuacionn);
 
 #endif

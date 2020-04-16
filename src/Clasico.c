@@ -2,36 +2,17 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include "Clasico.h"
 #define ALTO 3
 #define IZQUIERDA 2
-#define BAJO 25
+#define BAJO 23
 #define DERECHA 95
 #define MAX_AST 5
 #define MAX_LENGHT 15
 #define MAX_BALAS 50
 
-typedef struct 
-{
-	int x;
-	int y;
-	int vidas;
-	int corazones;
-} Nave;
 
-typedef struct 
-{
-	int x;
-	int y;
-} Asteroide;
-
-typedef struct 
-{
-	int x;
-	int y;
-}Bala;
-
-void subirNivelClasico(Asteroide* asteroides, int* num_ast)
+void subirNivelClasico(AsteroideC* asteroides, int* num_ast)
 {
 	if(*num_ast <= MAX_AST)
 	{
@@ -41,7 +22,7 @@ void subirNivelClasico(Asteroide* asteroides, int* num_ast)
 	}
 }
 
-void crearBala (Bala* balas, Nave* nave, int* numBala)
+void crearBala (Bala* balas, NaveC* nave, int* numBala)
 {
 	if (*numBala < MAX_BALAS)
 	{
@@ -78,7 +59,7 @@ void puntuacionFinal (WINDOW* puntuacion, float tiempo, float disparos)
 	wrefresh(puntuacion);
 }
 
-void pintarNaveChoqueClasico(WINDOW* ventana, Nave* nave)
+void pintarNaveChoqueClasico(WINDOW* ventana, NaveC* nave)
 {
 	wmove(ventana, nave->y, nave->x); wprintw(ventana, "\"\"\"\"");
 	wmove(ventana, nave->y-1, nave->x+1); wprintw(ventana, "\"\"");
@@ -96,7 +77,7 @@ void pintarChoqueAsteroideBala (WINDOW* ventana, Bala* bala)
 	wrefresh(ventana);
 }
 
-int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide)
+int choque(WINDOW* ventana, NaveC* nave, AsteroideC* asteroide)
 {
 	if((asteroide->x >= nave->x) && (asteroide->x <= nave->x+4) && (asteroide->y >= nave->y-1) && (asteroide->y <= nave->y))
 	{
@@ -109,7 +90,7 @@ int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide)
 		return 0;
 }
 
-int choqueBalaAsteroide(WINDOW* ventana, Bala* bala, Asteroide* asteroide)
+int choqueBalaAsteroide(WINDOW* ventana, Bala* bala, AsteroideC* asteroide)
 {
 	if((bala->x == asteroide->x) && ((bala->y == asteroide->y+1) || (bala->y == asteroide->y)))
 	{
@@ -123,7 +104,7 @@ int choqueBalaAsteroide(WINDOW* ventana, Bala* bala, Asteroide* asteroide)
 		return 0;
 }
 
-void pintarAsteroideVerticalClasico(WINDOW* ventana, Asteroide* asteroide)
+void pintarAsteroideVerticalClasico(WINDOW* ventana, AsteroideC* asteroide)
 {
 	wmove(ventana, asteroide->y, asteroide->x); wprintw(ventana, "O");
 
@@ -157,7 +138,7 @@ void actualizarClasico(WINDOW* ventana)
     box(ventana, 0,0);
 }
 
-void pintarNaveClasico(WINDOW* ventana, Nave* nave)
+void pintarNaveClasico(WINDOW* ventana, NaveC* nave)
 {
 	wmove(ventana, nave->y, nave->x); wprintw(ventana, "*****");
 	wmove(ventana, nave->y-1, nave->x+1); wprintw(ventana, "***");
@@ -226,7 +207,7 @@ void borrarVidas()
 	refresh();
 }
 
-void pintarVidasClasico(Nave* nave)
+void pintarVidasClasico(NaveC* nave)
 {
 	move(2,38); printw("%i",nave->vidas);
 	 
@@ -272,7 +253,7 @@ void crearVentanaClasico (WINDOW* ventana)
     wbkgd(ventana, COLOR_PAIR(1));
 }
 
-void liberarMemoriaClasico(Nave* nave, Asteroide* asteroides, Asteroide* asteroide1, Bala* balas, int* num_bala, int* num_ast, WINDOW* ventana, WINDOW* gameOver, WINDOW* puntuacionn)
+void liberarMemoriaClasico(NaveC* nave, AsteroideC* asteroides, AsteroideC* asteroide1, Bala* balas, int* num_bala, int* num_ast, WINDOW* ventana, WINDOW* gameOver, WINDOW* puntuacionn)
 {
 	mciSendString("stop song.mp3", NULL, 0, NULL);
     mciSendString("close song.mp3", NULL, 0, NULL);
@@ -325,13 +306,13 @@ void jugarClasico (void)
     WINDOW* puntuacionn = newwin(8,45,12,35);
 
 
-	Nave* nave = malloc(sizeof(Nave));
+	NaveC* nave = malloc(sizeof(NaveC));
     nave->x = 50;
     nave->y = 19;
     nave->corazones = 3;
     nave->vidas = 3;
 
-	Asteroide* asteroides = malloc(MAX_AST * sizeof(Asteroide));
+	AsteroideC* asteroides = malloc(MAX_AST * sizeof(AsteroideC));
 
     int* num_ast = malloc(sizeof(int));
     *num_ast = 1;
@@ -339,7 +320,7 @@ void jugarClasico (void)
     float tiempo = 0;
     int disparosAcertados = 0;
 
-    Asteroide* asteroide1 = malloc(sizeof(Asteroide));
+    AsteroideC* asteroide1 = malloc(sizeof(AsteroideC));
     asteroides[0].x = 25;
     asteroides[0].y = ALTO;
 
@@ -386,7 +367,7 @@ void jugarClasico (void)
 	        {
 	        	if(choque(ventana, nave, &asteroides[i]))
 	        	{
-	        		pintarNaveChoque(ventana, nave);
+	        		pintarNaveChoqueClasico(ventana, nave);
 	        		Beep(500,800);
 	        		Sleep(80);
 	        		aux = 1;

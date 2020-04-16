@@ -342,8 +342,8 @@ int menuPlayer (Usuario *usuario)
     {
         opciones[i] = malloc(MAX * sizeof(char));
     }
-    opciones[0] = "SUPERVIVENCIA";
-    opciones[1] = "CLASICO";
+    opciones[0] = "JUGAR SUPERVIVENCIA";
+    opciones[1] = "JUGAR CLASICO";
     opciones[2] = "RANKING CLASICO";
     opciones[3] = "MI CUENTA";
     opciones[4] = "SALIR";

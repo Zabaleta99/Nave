@@ -1,5 +1,7 @@
 #include "Usuarios.h"
 #include "Menus.h"
+#include "Supervivencia.h"
+#include "Clasico.h"
 #include <stdio.h>
 #include <stdlib.h>
 #define MAX 15
@@ -47,7 +49,8 @@ void menuMain()
 
 			if (selected == 0)
 			{
-
+				jugarSupervivencia();
+				selected = menuPlayer(user);
 			}
 			else if (selected == 1)
 			{
