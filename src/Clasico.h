@@ -1,15 +1,8 @@
-#ifndef _OPERACIONES_H_
-#define _OPERACIONES_H_
+#ifndef _CLASICO_H_
+#define _CLASICO_H_
 
 #include <curses.h>
-
-#define ALTO 3
-#define IZQUIERDA 2
-#define BAJO 23
-#define DERECHA 95
-#define MAX_AST 20
-#define MAX_LENGHT 15
-#define MAX_BALAS 200
+#include "Comun.h"
 
 typedef struct 
 {
@@ -17,14 +10,7 @@ typedef struct
 	int y;
 	int vidas;
 	int corazones;
-} Nave;
-
-typedef struct 
-{
-	int x;
-	int y;
-	int tipo;
-} Asteroide;
+} NaveClasico;
 
 typedef struct 
 {
@@ -32,52 +18,30 @@ typedef struct
 	int y;
 }Bala;
 
-WINDOW* mostrarInfo(void);
-
-WINDOW* mostrarJuego(void);
-
-WINDOW* mostrarGameOver(void);
-
+WINDOW* mostrarInfoC(void);
+WINDOW* mostrarJuegoC(void);
+WINDOW* mostrarGameOverC(void);
 WINDOW* mostrarPuntuacion (float tiempo, int* disparosAcertados);
-
-void subirNivel(Asteroide* asteroides, int* num_ast);
-
-void crearBala (Bala* balas, Nave* nave, int* num_balas);
-
-void pintarNaveChoque(WINDOW* ventana, Nave* nave);
-
+void subirNivelC(Asteroide* asteroides, int* num_ast);
+void crearBala (Bala* balas, NaveClasico* nave, int* num_balas);
+void pintarNaveChoqueC(WINDOW* ventana, NaveClasico* nave);
 void pintarChoqueAsteroideBala (WINDOW* ventana, Bala* bala);
-
-void nuevoAsteroideVertical(Asteroide* asteroide);
-
-void nuevoAsteroideHorizontal(Asteroide* asteroide);
-
-int choque(WINDOW* ventana, Nave* nave, Asteroide* asteroide);
-
+void pintarAsteroidesC(WINDOW* ventana, Asteroide* asteroides, int* num_ast);
+void nuevoAsteroideVerticalC(Asteroide* asteroide);
+void nuevoAsteroideHorizontalC(Asteroide* asteroide);
+int choqueC(WINDOW* ventana, NaveClasico* nave, Asteroide* asteroide);
 int choqueBalaAsteroide(WINDOW* ventana, Bala* bala, Asteroide* asteroide, int* disparosAcertados);
-
-void pintarAsteroideVertical(WINDOW* ventana, Asteroide* asteroide);
-
+void pintarAsteroideVerticalC(WINDOW* ventana, Asteroide* asteroide);
 void pintarBala(WINDOW* ventana, Bala* bala);
-
-void pintarNave(WINDOW* ventana, Nave* nave);
-
-int menuSalida(void);
-
-void pintarVidas(Nave* nave);
-
+void pintarNaveC(WINDOW* ventana, NaveClasico* nave);
+int menuSalidaC(void);
+void pintarVidasC(NaveClasico* nave);
 void actualizarDisparosAcertados (int* disparosAcertados, int* num_balas);
-
-void actualizar(WINDOW* ventana, Nave* nave, int* disparosAcertados, int* num_balas);
-
-void inicializarParametros(Nave* nave, Asteroide* asteroides, int* num_ast, int* num_balas, int* disparosAcertados);
-
-void liberarMemoria(Nave* nave, Asteroide* asteroides, int* num_ast, Bala* balas, int* num_balas, int* disparosAcertados, WINDOW* ventana, WINDOW* gameOver, WINDOW* puntuacion);
-
-void reestablecerValores(int segundos, int tiempo, Asteroide* asteroides, int* num_ast, Bala* balas, int* num_balas, int* disparosAcertados);
-
-void movimientosJugador(int tecla, Nave* nave, Bala* balas, int* num_balas);
-
+void actualizarC(WINDOW* ventana, NaveClasico* nave, int* disparosAcertados, int* num_balas);
+void inicializarParametrosC(NaveClasico* nave, Asteroide* asteroides, int* num_ast, int* num_balas, int* disparosAcertados);
+void liberarMemoriaC(NaveClasico* nave, Asteroide* asteroides, int* num_ast, Bala* balas, int* num_balas, int* disparosAcertados, WINDOW* ventana, WINDOW* gameOver, WINDOW* puntuacion);
+void reestablecerValoresC(int segundos, int tiempo, Asteroide* asteroides, int* num_ast, Bala* balas, int* num_balas, int* disparosAcertados, int choqueAsteroide, int choqueBala);
+void movimientosJugadorC(int tecla, NaveClasico* nave, Bala* balas, int* num_balas);
 void jugarClasico(void);
 
 #endif
