@@ -24,15 +24,6 @@ void menuMain()
     Usuario * arrayUsers;
     arrayUsers = leerUsuarios(file, size);
 
-    /*for (int i=0; i<*size; i++)
-    {
-        printf("Nombre: %s   Contra: %s\n", (arrayUsers+i)->nickname, (arrayUsers+i)->contrasenya);
-        fflush(stdout);
-    }
-    printf(":::::::::::::::::::::::::::::\n");
-    fflush(stdout);
-    Sleep(6000);*/
-
     int opcion = menuInicio();
     Usuario *user;
 
@@ -79,6 +70,7 @@ void menuMain()
 
     else
     {
+        liberarMemoriaMenuMain (size, user, arrayUsers);
         exit(0);
     }
 }
@@ -142,10 +134,8 @@ int menuInicio ()
     	if(eleccion == 10)
     		break;
     }
-    werase(inicio);
-    erase();
-    refresh();
-    wrefresh(inicio);
+
+    liberarMemoriaMenuInicio(opciones, inicio);
    
     return seleccion;
 }
@@ -172,8 +162,6 @@ Usuario * menuIniciarSesion(Usuario *usuarios, int size)
 
     wattroff(inicioSesion, COLOR_PAIR(1));
     wrefresh(inicioSesion);
-
-    echo(); //ya esta por defecto ensi
 
     char aux[MAX];
     curs_set(1);
@@ -206,13 +194,15 @@ Usuario * menuIniciarSesion(Usuario *usuarios, int size)
         }
     }
 
+    Usuario *player;
 
     if (boolean == 1)
     {
         curs_set(1);
-        Usuario *player = (Usuario *) malloc(sizeof(Usuario));
+        player = (Usuario *) malloc(sizeof(Usuario));
         player->nickname = userIntroduced;
         player->contrasenya = passIntroduced;
+        liberarMemoriaMenuInicioSesion(userIntroduced, passIntroduced, inicioSesion);
         return player;
     }
 
@@ -225,9 +215,19 @@ Usuario * menuIniciarSesion(Usuario *usuarios, int size)
         wprintw(stdscr, "YOU HAVE ENTERED WRONGLY 3 TIMES. TRY NEXT TIME...");
         wattroff(stdscr, COLOR_PAIR(2));
         refresh();
+
         Sleep(1500);
-        return 0;
+
+        free(player->nickname);
+        free(player->contrasenya);
+        free(player);
+        liberarMemoriaMenuInicioSesion(userIntroduced, passIntroduced, inicioSesion);
+
+        
+        
+        exit(0);
     }
+
 
     if(boolean == -1)
     {
@@ -243,9 +243,7 @@ Usuario * menuIniciarSesion(Usuario *usuarios, int size)
         move(14, 9);
         wprintw(stdscr, "INCORRECT NICKNAME! TRY AGAIN");
         contadorSalida++;
-        menuIniciarSesion(usuarios, size);
-        
-        
+        menuIniciarSesion(usuarios, size); 
     }
 }
 
@@ -349,25 +347,11 @@ void menuRegistrarse (Usuario *usuarios, int size)
         wprintw(stdscr, "REGISTRADO!");
         refresh();
 
-        /*for (int i=0; i<size; i++)
-        {
-            printf("Na: %s    Ca: %s\n", usuarios[i].nickname, usuarios[i].contrasenya);
-            fflush(stdout);
-        }
-        printf("-----------------------");
-        fflush(stdout);*/
-
         usuariosActualizados = (Usuario *) malloc ((size+1) * sizeof(Usuario));
         for (int i=0; i<size; i++)
         {
             usuariosActualizados[i] = usuarios[i];
-            //usuariosActualizados[i].contrasenya = usuarios[i].contrasenya;
-            /*free(usuarios[i].nickname);
-            free(usuarios[i].contrasenya);*/
         }
-
-
-       // free(usuarios);
 
         usuariosActualizados[size].nickname = (char *) malloc((strlen(userIntroduced)+1) * sizeof(char));
         sscanf(userIntroduced, "%s", usuariosActualizados[size].nickname);
@@ -378,19 +362,10 @@ void menuRegistrarse (Usuario *usuarios, int size)
         
         size++;
 
-        /*for (int i=0; i<size; i++)
-        {
-            printf("N: %s    C: %s\n", usuariosActualizados[i].nickname, usuariosActualizados[i].contrasenya);
-            fflush(stdout);
-        }*/
-
         escribirUsuarios(usuariosActualizados, size);
         Sleep(1500);
-        werase(registro);
-        erase();
-        wrefresh(registro);
-        refresh();
 
+        liberarMemoriaMenuRegistrarse(registro, usuariosActualizados, size, userIntroduced, passIntroduced, passConfiIntroduced);
         menuMain();
     }
 }
@@ -455,12 +430,106 @@ int menuPlayer (Usuario *usuario)
         if(eleccion == 10)
             break;
     }
-    werase(player);
-    erase();
-    refresh();
-    wrefresh(player);
+
+    liberarMemoriaMenuPlayer(player, opciones);
 
     return seleccion;
 }
 
 
+void liberarMemoriaMenuMain (int *size, Usuario* user, Usuario* arrayUsers)
+{
+    free(user->nickname);
+    user->nickname = NULL;
+    free(user->contrasenya);
+    user->contrasenya = NULL;
+    free(user);
+    user = NULL;
+
+    for (int i=0; i<*size; i++)
+    {
+        free(arrayUsers[i].nickname);
+        arrayUsers[i].nickname = NULL;
+        free(arrayUsers[i].contrasenya);
+        arrayUsers[i].contrasenya = NULL;
+    }
+    free(arrayUsers);
+    arrayUsers = NULL;
+
+    free(size);
+    size = NULL;
+}
+
+void liberarMemoriaMenuInicio(char** opciones, WINDOW* inicio)
+{
+    for (int i=0; i<3; i++)
+    {
+        free(opciones[i]);
+        opciones[i] = NULL;
+    }
+    free (opciones);
+    opciones = NULL;
+
+    werase(inicio);
+    erase();
+    refresh();
+    wrefresh(inicio);
+}   
+
+void liberarMemoriaMenuInicioSesion(char* userIntroduced, char* passIntroduced, WINDOW* inicioSesion)
+{
+    free(userIntroduced);
+    userIntroduced = NULL;
+
+    free(passIntroduced);
+    passIntroduced = NULL;
+
+    werase(inicioSesion);
+    erase();
+    refresh();
+    wrefresh(inicioSesion);
+}
+
+void liberarMemoriaMenuRegistrarse(WINDOW* registro, Usuario* usuariosActualizados, int size, char* userIntroduced, char* passIntroduced, char* passConfiIntroduced)
+{
+    werase(registro);
+    erase();
+    wrefresh(registro);
+    refresh();
+
+    for (int i=0; i<size; i++)
+    {
+        free(usuariosActualizados[i].nickname);
+        usuariosActualizados[i].nickname = NULL;
+        free(usuariosActualizados[i].contrasenya);
+        usuariosActualizados[i].contrasenya = NULL;
+    }
+    free(usuariosActualizados);
+    usuariosActualizados = NULL;
+
+    free(userIntroduced);
+    userIntroduced = NULL;
+
+    free(passIntroduced);
+    passIntroduced = NULL;
+
+    free(passConfiIntroduced);
+    passConfiIntroduced = NULL;
+}
+
+void liberarMemoriaMenuPlayer(WINDOW* player, char** opciones)
+{
+    for (int i=0; i<4; i++)
+    {
+        free(opciones[i]);
+        opciones[i] = NULL;
+    }
+    free (opciones);
+    opciones = NULL;
+
+    werase(player);
+    erase();
+    refresh();
+    wrefresh(player);
+
+}
