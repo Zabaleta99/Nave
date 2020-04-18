@@ -4,13 +4,11 @@
 #include <string.h>
 #define MAX 50
 
-void vaciar (char aux []);
-
 Usuario * leerUsuarios (FILE *file, int *size)
 {
 	char aux[MAX];
 	vaciar(aux);
-	char c = '\0';
+	char c;
 
 	fgets(aux, MAX, file);
 	sscanf(aux, "%d", size);
@@ -19,7 +17,6 @@ Usuario * leerUsuarios (FILE *file, int *size)
 
 	for (int i=0; !feof(file); i++)
 	{
-		c = '\0';
 		for (int j=0; c!=';'; j++)
 		{
 			c = fgetc(file);
@@ -32,9 +29,6 @@ Usuario * leerUsuarios (FILE *file, int *size)
 
 		(arrayUsuarios + i)->nickname = (char *) malloc ((strlen(aux)+1) * sizeof (char));
 		sscanf(aux, "%s", (arrayUsuarios+i)->nickname);
-		vaciar(aux);
-
-		c = '\0';
 
 		for (int k=0; (c != '\n') && (!feof(file)); k++)
 		{
@@ -47,9 +41,7 @@ Usuario * leerUsuarios (FILE *file, int *size)
 
 		(arrayUsuarios + i)->contrasenya = (char *) malloc ((strlen(aux)+1) * sizeof (char));
 		sscanf(aux, "%s", (arrayUsuarios+i)->contrasenya);
-		vaciar(aux);
 	}
-
 	fclose(file);
 	return arrayUsuarios;
 }
@@ -78,14 +70,5 @@ void escribirUsuarios(Usuario *usuarios, int size)
 			fprintf(file, "%s;%s\n", usuarios[i].nickname, usuarios[i].contrasenya);
 		}
 	}
-
 	fclose(file);
-}
-
-void vaciar (char aux [])
-{
-	for (int i=0; i<50; i++)
-	{
-		aux[i] = '\0';
-	}
 }

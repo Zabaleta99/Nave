@@ -11,7 +11,7 @@ typedef struct
 } Usuario;
 
 
-Usuario * leerUsuarios (FILE *file, int *size);
+Usuario* leerUsuarios(FILE *file, int *size);
 void escribirUsuarios(Usuario *usuarios, int size);
 
 
