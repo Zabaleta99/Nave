@@ -3,7 +3,7 @@
 #include "Usuarios.h"
 
 void menuMain();
-int menuInicio (void);
+int menuInicio ();
 void menuRegistrarse(Usuario *usuarios, int size);
 Usuario * menuIniciarSesion(Usuario *usuarios, int size);
 int menuPlayer (Usuario *player);

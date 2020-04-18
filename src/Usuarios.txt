@@ -1,4 +1,4 @@
-9
+11
 jon;zaba
 amaiur13;remi
 pol;fer
@@ -8,3 +8,5 @@ ane;bollo
 amaia;Zarranz
 hola;adios
 aritz;sistiaga
+jonquel;perez
+pepito;hola

@@ -40,8 +40,9 @@ void menuMain()
     {
         user = menuIniciarSesion(arrayUsers, *size);
         int selected = menuPlayer(user);
+        int auxSalir = 0;
 
-        while (selected != 4)
+        while (auxSalir != 1)
         {
 
             if (selected == 0)
@@ -65,22 +66,28 @@ void menuMain()
 
             else if (selected == 4)
             {
+                auxSalir = 1;
                 menuMain();
             }
         }
     }
 
-    if (opcion == 1)
+    else if (opcion == 1)
     {
         menuRegistrarse(arrayUsers, *size);
     }
+
+    else
+    {
+        exit(0);
+    }
 }
 
-int menuInicio (void)
+int menuInicio ()
 {
 	initscr();
 	curs_set(0);
-	WINDOW* inicio = newwin(4,100,10,9);
+	WINDOW* inicio = newwin(5,100,10,9);
     move(9, 42);
     start_color();
     init_pair(3, COLOR_WHITE, COLOR_RED);
@@ -92,20 +99,21 @@ int menuInicio (void)
     box(inicio,0,0);
     keypad(inicio, TRUE);
 
-    char** opciones = malloc(2 * sizeof(char*));
-    for(int i=0; i<2; i++)
+    char** opciones = malloc(3 * sizeof(char*));
+    for(int i=0; i<3; i++)
     {
     	opciones[i] = malloc(MAX * sizeof(char));
     }
-    opciones[0] = "Iniciar sesion";
-    opciones[1] = "Registrarse";
+    opciones[0] = "INICIAR SESION";
+    opciones[1] = "REGISTRARSE";
+    opciones[2] = "CERRAR JUEGO";
 
     int eleccion;
     int seleccion = 0;
 
     while(1)
     {
-    	for(int i=0; i<2; i++)
+    	for(int i=0; i<3; i++)
     	{
     		if(i==seleccion)
     			wattron(inicio, A_REVERSE);
@@ -125,8 +133,8 @@ int menuInicio (void)
     			break;
     		case KEY_DOWN:
     			seleccion++;
-    			if(seleccion == 2)
-    				seleccion = 1;
+    			if(seleccion == 3)
+    				seleccion = 2;
     			break;
     		default:
     			break;
@@ -138,11 +146,8 @@ int menuInicio (void)
     erase();
     refresh();
     wrefresh(inicio);
-
    
-    if(seleccion == 0)
-    	return 0;
-    return 1;
+    return seleccion;
 }
 
 Usuario * menuIniciarSesion(Usuario *usuarios, int size)
