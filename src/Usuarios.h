@@ -4,10 +4,9 @@
 
 typedef struct
 {
-	char *nickname;
-	char *contrasenya;
-	int *puntuaciones;
-	int mejorPuntuacion;
+	char* nickname;
+	char* contrasenya;
+	float* puntuaciones;
 } Usuario;
 
 

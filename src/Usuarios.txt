@@ -1,12 +1,5 @@
-11
-jon;zaba
-amaiur13;remi
-pol;fer
-juan;cendo
-javi;goros
-ane;bollo
-amaia;Zarranz
-hola;adios
-aritz;sistiaga
-jonquel;perez
-pepito;hola
+4
+paul;hernandez;3.00;7.00
+jon;zaba;0.00;0.00
+joxe;angel;325.50;2.00
+txanogorritxu;basoradoa;0.00;0.00

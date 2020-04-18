@@ -4,46 +4,41 @@
 #include <string.h>
 #define MAX 50
 
-Usuario * leerUsuarios (FILE *file, int *size)
+Usuario* leerUsuarios (FILE *file, int *size)
 {
-	char aux[MAX];
-	vaciar(aux);
-	char c;
+	char* linea = malloc(MAX * sizeof(char));
+	char** items = malloc(4 * sizeof(char*));
 
-	fgets(aux, MAX, file);
-	sscanf(aux, "%d", size);
+	fgets(linea, MAX, file);
+	sscanf(linea, "%d", size);
 
-	Usuario *arrayUsuarios = (Usuario *) malloc (*size * sizeof(Usuario));
+	Usuario *usuarios = (Usuario*) malloc(*size * sizeof(Usuario));
 
-	for (int i=0; !feof(file); i++)
+	int contador = 0;
+	while(fgets(linea, MAX, file))
 	{
-		for (int j=0; c!=';'; j++)
+		char* token = strtok(linea, ";");
+		int i=0;
+		while(token != NULL)
 		{
-			c = fgetc(file);
-
-			if(c != ';')
-			{
-				aux[j] = c;
-			}
+			items[i] = token;
+			token = strtok(NULL, ";");
+			i++;
 		}
-
-		(arrayUsuarios + i)->nickname = (char *) malloc ((strlen(aux)+1) * sizeof (char));
-		sscanf(aux, "%s", (arrayUsuarios+i)->nickname);
-
-		for (int k=0; (c != '\n') && (!feof(file)); k++)
-		{
-			c = fgetc(file);
-			if ((c != '\n') && (!feof(file)))
-			{
-				aux[k] = c;
-			}
-		}
-
-		(arrayUsuarios + i)->contrasenya = (char *) malloc ((strlen(aux)+1) * sizeof (char));
-		sscanf(aux, "%s", (arrayUsuarios+i)->contrasenya);
+		usuarios[contador].nickname = malloc((strlen(items[0])+1) * sizeof(char));
+		strcpy(usuarios[contador].nickname, items[0]);
+		usuarios[contador].contrasenya = malloc((strlen(items[1])+1) * sizeof(char));
+		strcpy(usuarios[contador].contrasenya, items[1]);
+		usuarios[contador].puntuaciones = malloc(2 * sizeof(float));
+		usuarios[contador].puntuaciones[0] = strtof(items[2], NULL);
+		usuarios[contador].puntuaciones[1] = strtof(items[3], NULL);
+		contador++;
 	}
-	fclose(file);
-	return arrayUsuarios;
+	free(linea);
+	linea = NULL;
+	free(items);
+	items = NULL;
+	return usuarios;
 }
 
 void escribirUsuarios(Usuario *usuarios, int size)
@@ -62,13 +57,15 @@ void escribirUsuarios(Usuario *usuarios, int size)
 	{
 		if (i == size-1)
 		{
-			fprintf(file, "%s;%s", usuarios[i].nickname, usuarios[i].contrasenya);
+			fprintf(file, "%s;%s;%0.2f;%0.2f", usuarios[i].nickname, usuarios[i].contrasenya, usuarios[i].puntuaciones[0], usuarios[i].puntuaciones[1]);
 		}
 
 		else
 		{
-			fprintf(file, "%s;%s\n", usuarios[i].nickname, usuarios[i].contrasenya);
+			fprintf(file, "%s;%s;%0.2f;%0.2f\n", usuarios[i].nickname, usuarios[i].contrasenya, usuarios[i].puntuaciones[0], usuarios[i].puntuaciones[1]);
 		}
 	}
 	fclose(file);
+	free(file);
+	file = NULL;
 }

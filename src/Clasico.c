@@ -35,8 +35,12 @@ WINDOW* mostrarGameOverC(void)
 	return gameOver;
 }
 
-WINDOW* mostrarPuntuacion (float tiempo, int* disparosAcertados)
+WINDOW* mostrarPuntuacion (Usuario* usuarios, int player, float tiempo, int* disparosAcertados)
 {
+	float puntuacionTotal = tiempo*10 + *disparosAcertados;
+	if(puntuacionTotal > usuarios[player].puntuaciones[0])
+		usuarios[player].puntuaciones[0] = puntuacionTotal;
+
 	WINDOW* puntuacion = newwin(8,45,12,35);
 	refresh();
 	box(puntuacion,0,0);
@@ -49,8 +53,7 @@ WINDOW* mostrarPuntuacion (float tiempo, int* disparosAcertados)
 	wmove(puntuacion,4,2);
 	wprintw(puntuacion,"----------------------------------");
 	wmove(puntuacion,5,2);
-	wprintw(puntuacion,"TOTAL: %0.2f", tiempo*10 + *disparosAcertados);
-
+	wprintw(puntuacion,"TOTAL: %0.2f", puntuacionTotal);
 	wrefresh(puntuacion);
 	return puntuacion;
 }
@@ -425,7 +428,7 @@ void movimientosJugadorC(int tecla, NaveClasico* nave, Bala* balas, int* num_bal
     }
 }
 
-void jugarClasico(void)
+void jugarClasico(Usuario* usuarios, int player)
 {
     initscr();
 	curs_set(0);
@@ -533,7 +536,7 @@ void jugarClasico(void)
         	if(nave->vidas == 0)
         	{
         		gameOver = mostrarGameOverC();
-        		puntuacion = mostrarPuntuacion(tiempo,disparosAcertados);
+        		puntuacion = mostrarPuntuacion(usuarios, player, tiempo,disparosAcertados);
         		break;
         	}
 

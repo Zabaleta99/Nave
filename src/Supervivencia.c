@@ -38,7 +38,7 @@ void subirNivelS(Asteroide* asteroides, int* num_ast)
 	}
 }
 
-WINDOW* mostrargameOverS(void)
+WINDOW* mostrarGameOverS(void)
 {
 	WINDOW* gameOver = newwin(5,21,12,50);
 	refresh();
@@ -365,8 +365,13 @@ void reestablecerValoresS(int segundos, Asteroide* asteroides, int* num_ast, int
 	}
 	*num_ast = 0;
 }
+void guardarPuntuacion(Usuario* usuarios, int player, int* num_ast)
+{
+	if(*num_ast > usuarios[player].puntuaciones[1])
+		usuarios[player].puntuaciones[1] = *num_ast;
+}
 
-void jugarSupervivencia (void)
+void jugarSupervivencia (Usuario* usuarios, int player)
 {
     initscr();
 	curs_set(0);
@@ -447,7 +452,8 @@ void jugarSupervivencia (void)
 
 	        if(nave->vidas == 0)
 	        {
-	        	gameOver = mostrargameOverS();
+	        	guardarPuntuacion(usuarios, player, num_ast);
+	        	gameOver = mostrarGameOverS();
 	        	break;
 	        }	
 
@@ -464,6 +470,7 @@ void jugarSupervivencia (void)
     		break;
     	reestablecerValoresS(segundos, asteroides, num_ast, choque_asteroide, choque_vidaExtra);
     }
+
     liberarMemoriaS(nave, asteroides, num_ast, vidasExtra, num_vidasExtra, ventana, gameOver);
 	endwin();
 }
