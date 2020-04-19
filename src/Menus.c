@@ -5,7 +5,8 @@
 #include "Menus.h"
 #include "Usuarios.h"
 #include "Supervivencia.h"
-#include "Clasico.h"
+#include "Rankings.h"
+#include "Clasico.h" 
 #include <curses.h>
 #include <windows.h>
 static int contadorSalida = 0;
@@ -19,6 +20,8 @@ void liberarMemoriaMenuMain (int *size, Usuario* arrayUsers)
         arrayUsers[i].nickname = NULL;
         free(arrayUsers[i].contrasenya);
         arrayUsers[i].contrasenya = NULL;
+        free(arrayUsers[i].puntuaciones);
+        arrayUsers[i].puntuaciones = NULL;
     }
     free(arrayUsers);
     arrayUsers = NULL;
@@ -104,6 +107,7 @@ void liberarMemoriaMenuPlayer(WINDOW* player, char** opciones)
 int menuInicio(void)
 {
     initscr();
+    noecho();
     curs_set(0);
     WINDOW* inicio = newwin(5,100,10,9);
     move(9, 42);
@@ -168,6 +172,7 @@ int menuInicio(void)
 
 int menuIniciarSesion(Usuario *usuarios, int size)
 {
+    echo();
     move(9, 51);
     attron(A_REVERSE);
     printw("  LOGIN  ");
@@ -250,7 +255,6 @@ int menuIniciarSesion(Usuario *usuarios, int size)
         wprintw(stdscr, "INCORRECT PASSWORD! TRY AGAIN");
         contadorSalida++;
         menuIniciarSesion(usuarios, size);
-        
     }
 
     if (boolean == 0)
@@ -265,7 +269,7 @@ int menuIniciarSesion(Usuario *usuarios, int size)
 void menuRegistrarse (Usuario *usuarios, int size)
 {
     Usuario *usuariosActualizados;
-
+    echo();
     move(9, 51);
     attron(A_REVERSE);
     printw("    REGISTRATE    ");
@@ -319,8 +323,9 @@ void menuRegistrarse (Usuario *usuarios, int size)
         wmove(registro, 1, 11);
         wprintw(registro, "             ");
         wmove(registro, 1, 11);
+
         wgetnstr(registro, aux, MAX);
-        char *userIntroduced = (char *) malloc((strlen(aux)+1) * sizeof(char));
+        userIntroduced = (char *) malloc((strlen(aux)+1) * sizeof(char));
         sscanf(aux, "%s", userIntroduced);
 
         bl = 0;
@@ -389,6 +394,7 @@ void menuRegistrarse (Usuario *usuarios, int size)
 int menuPlayer(void)
 {
     curs_set(0);
+    noecho();
     WINDOW* player = newwin(8,100,10,9);
     move(9, 42);
     start_color();
@@ -485,6 +491,7 @@ void menuMain()
                             jugarClasico(usuarios, player);
                             break;
                         case 2:
+                            rankingClasico(usuarios, *size);
                             break;
                         case 3:
                             break;
