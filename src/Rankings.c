@@ -60,13 +60,13 @@ void rankingClasico (Usuario* usuarios, int size)
 	}
 
 	noecho();
-	move((MAX_Y/2)-(1.5*size)/2-1, MAX_X/4);
+	move((MAX_Y/2)-(size+2)/2-1, MAX_X/4);
     start_color();
     init_pair(1, COLOR_WHITE, COLOR_RED);
     attron(COLOR_PAIR(1));
     printw("  RANKING CLASICO  ");
     attroff(COLOR_PAIR(1));
-    WINDOW* rankingClasico = newwin(1.5*size,MAX_X/2,(MAX_Y/2)-(1.5*size)/2,MAX_X/4);
+    WINDOW* rankingClasico = newwin(size+2,MAX_X/2,(MAX_Y/2)-(size+2)/2,MAX_X/4);
     box(rankingClasico,0,0);
     refresh();
     wrefresh(rankingClasico);
@@ -74,13 +74,13 @@ void rankingClasico (Usuario* usuarios, int size)
     for (int i=0; i<size && i<10; i++)
     {
     	mvwprintw(rankingClasico, 1+i, 1, "%d.- %s", (i+1), arrayUsuarios[i].nickname);
-    	mvwprintw(rankingClasico, 1+i, 28, "%.2f", arrayUsuarios[i].puntuaciones[0]);
-    	mvwprintw(rankingClasico, 1+i, 36, "puntos");
+    	mvwprintw(rankingClasico, 1+i, MAX_X/4, "%.2f", arrayUsuarios[i].puntuaciones[0]);
+    	mvwprintw(rankingClasico, 1+i, 3*MAX_X/8, "puntos");
     }
 
     wrefresh(rankingClasico);
 
-    move((MAX_Y/2)+(1.5*size)/2+1,MAX_X/4);
+    move((MAX_Y/2)+(size+2)/2+1,MAX_X/4);
     attron(A_REVERSE);
     printw("pulsa enter para volver...");
     attroff(A_REVERSE);
@@ -113,13 +113,13 @@ void rankingSupervivencia(Usuario* usuarios, int size)
 	}
 
 	noecho();
-	move((MAX_Y/2)-(1.5*size)/2-1,MAX_X/4);
+	move((MAX_Y/2)-(size+2)/2-1,MAX_X/4);
     start_color();
     init_pair(1, COLOR_WHITE, COLOR_RED);
     attron(COLOR_PAIR(1));
     printw("  RANKING SUPERVIVENCIA  ");
     attroff(COLOR_PAIR(1));
-    WINDOW* rankingSupervivencia = newwin(1.5*size,MAX_X/2,(MAX_Y/2)-(1.5*size)/2,MAX_X/4);
+    WINDOW* rankingSupervivencia = newwin(size+2,MAX_X/2,(MAX_Y/2)-(size+2)/2,MAX_X/4);
     box(rankingSupervivencia,0,0);
     refresh();
     wrefresh(rankingSupervivencia);
@@ -127,13 +127,13 @@ void rankingSupervivencia(Usuario* usuarios, int size)
     for (int i=0; i<size && i<10; i++)
     {
     	mvwprintw(rankingSupervivencia, 1+i, 1, "%d.- %s", (i+1), arrayUsuarios[i].nickname);
-    	mvwprintw(rankingSupervivencia, 1+i, 28, "nivel");
-    	mvwprintw(rankingSupervivencia, 1+i, 36, "%.0f", arrayUsuarios[i].puntuaciones[1]);
+    	mvwprintw(rankingSupervivencia, 1+i, MAX_X/4, "nivel");
+    	mvwprintw(rankingSupervivencia, 1+i, 3*MAX_X/8, "%.0f", arrayUsuarios[i].puntuaciones[1]);
     }
 
     wrefresh(rankingSupervivencia);
 
-    move((MAX_Y/2)+(1.5*size)/2+1,MAX_X/4);
+    move((MAX_Y/2)+(size+2)/2+1,MAX_X/4);
     attron(A_REVERSE);
     printw("pulsa enter para volver...");
     attroff(A_REVERSE);
