@@ -3,5 +3,6 @@
 #include "Usuarios.h"
 
 void rankingClasico (Usuario* usuarios, int size);
+void rankingSupervivencia(Usuario* usuarios, int size);
 
 #endif

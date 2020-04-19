@@ -396,7 +396,7 @@ int menuPlayer(void)
     curs_set(0);
     noecho();
     WINDOW* player = newwin(8,100,10,9);
-    move(9, 42);
+    move(9, 50);
     start_color();
     init_pair(3, COLOR_WHITE, COLOR_RED);
     attron(COLOR_PAIR(3));
@@ -412,10 +412,10 @@ int menuPlayer(void)
     {
         opciones[i] = malloc(MAX * sizeof(char));
     }
-    opciones[0] = "JUGAR SUPERVIVENCIA";
-    opciones[1] = "JUGAR CLASICO";
+    opciones[0] = "JUGAR CLASICO";
+    opciones[1] = "JUGAR SUPERVIVENCIA";
     opciones[2] = "RANKING CLASICO";
-    opciones[3] = "MI CUENTA";
+    opciones[3] = "RANKING SUPERVIVENCIA";
     opciones[4] = "SALIR";
 
     int eleccion;
@@ -485,15 +485,18 @@ void menuMain()
                     switch(selected)
                     {
                         case 0:
-                            jugarSupervivencia(usuarios, player);
+                            jugarClasico(usuarios, player);
+                            escribirUsuarios(usuarios, *size);
                             break;
                         case 1:
-                            jugarClasico(usuarios, player);
+                            jugarSupervivencia(usuarios, player);
+                            escribirUsuarios(usuarios, *size);
                             break;
                         case 2:
                             rankingClasico(usuarios, *size);
                             break;
                         case 3:
+                            rankingSupervivencia(usuarios, *size);
                             break;
                         default:
                             break;
@@ -509,7 +512,6 @@ void menuMain()
         }
         if(opcion == 2) break; 
     }
-    escribirUsuarios(usuarios,*size);
     liberarMemoriaMenuMain (size, usuarios);
     exit(0);    
 }

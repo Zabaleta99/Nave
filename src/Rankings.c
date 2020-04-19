@@ -1,65 +1,63 @@
-#include "Usuarios.h"
 #include <curses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "Menus.h"
+#include "Usuarios.h"
 
-
-void liberarMemoriaRankingClasico (Usuario* arrayusuarios, int size, Usuario* aux, WINDOW* rankingClasico)
+void liberarMemoriaRankingClasico (Usuario* arrayusuarios, Usuario* aux, WINDOW* rankingClasico)
 {
-	/*for (int i=0; i<size; i++)
-	{
-		free(arrayusuarios[i].nickname);
-		arrayusuarios[i].nickname = NULL;
-		free(arrayusuarios[i].contrasenya);
-		arrayusuarios[i].contrasenya = NULL;
-		free(arrayusuarios[i].puntuaciones);
-		arrayusuarios[i].puntuaciones = NULL;
-	}
 	free(arrayusuarios);
-	arrayusuarios = NULL;*/
+	arrayusuarios = NULL;
 
-	free(aux->nickname);
-	aux->nickname = NULL;
-	free(aux->contrasenya);
-	aux->contrasenya = NULL;
-	free(aux->puntuaciones);
-	aux->puntuaciones = NULL;
-
-
-	werase(rankingClasico);
-    erase();
+	free(aux);
+	aux = NULL;
+	
+	wclear(rankingClasico);
     wrefresh(rankingClasico);
+    delwin(rankingClasico);
+    clear();
     refresh();
- 
-    //endwin();
+}
+
+void liberarMemoriaRankingSupervivencia(Usuario* arrayusuarios, Usuario* aux, WINDOW* rankingSupervivencia)
+{
+	free(arrayusuarios);
+	arrayusuarios = NULL;
+
+	free(aux);
+	aux = NULL;
+	
+	wclear(rankingSupervivencia);
+    wrefresh(rankingSupervivencia);
+    delwin(rankingSupervivencia);
+    clear();
+    refresh();
 }
 
 void rankingClasico (Usuario* usuarios, int size)
 {
-	Usuario* arrayUsuarios;
-	arrayUsuarios = (Usuario*) malloc (size * sizeof(Usuario));
+	Usuario* arrayUsuarios = (Usuario*) malloc (size * sizeof(Usuario));
     for (int i=0; i<size; i++)
     {
         arrayUsuarios[i] = usuarios[i];
     }
 
 	Usuario* aux = (Usuario*) malloc (sizeof(Usuario));
-	for (int i=0; i<size; i++)
+	for (int i=0; i<size-1; i++)
 	{
-		for (int j=0; j<size-1; j++)
+		for (int j=0; j<size-i-1; j++)
 		{
 			if (arrayUsuarios[j].puntuaciones[0] < arrayUsuarios[j+1].puntuaciones[0])
 			{
-				*(aux) = arrayUsuarios[j];
+				*aux = arrayUsuarios[j];
 				arrayUsuarios[j] = arrayUsuarios[j+1];
-				arrayUsuarios[j+1] = *(aux);
+				arrayUsuarios[j+1] = *aux;
 			}
 		}
 	}
 
 	noecho();
-	move(9, 43);
+	move(9, 48);
     start_color();
     init_pair(1, COLOR_WHITE, COLOR_RED);
     attron(COLOR_PAIR(1));
@@ -70,24 +68,72 @@ void rankingClasico (Usuario* usuarios, int size)
     refresh();
     wrefresh(rankingClasico);
 
-    int posicion = 1;
-    for (int i=0; i<size; i++)
+    for (int i=0; i<size && i<10; i++)
     {
-    	wmove(rankingClasico, posicion+i, 1); wprintw(rankingClasico, "%d.- %s", (i+1), arrayUsuarios[i].nickname);
-    	wmove(rankingClasico, posicion+i, 28); wprintw(rankingClasico, "%.2f", arrayUsuarios[i].puntuaciones[0]);
-    	wmove(rankingClasico, posicion+i, 36); wprintw(rankingClasico, "puntos");
+    	mvwprintw(rankingClasico, 1+i, 1, "%d.- %s", (i+1), arrayUsuarios[i].nickname);
+    	mvwprintw(rankingClasico, 1+i, 28, "%.2f", arrayUsuarios[i].puntuaciones[0]);
+    	mvwprintw(rankingClasico, 1+i, 36, "puntos");
     }
 
     wrefresh(rankingClasico);
 
-    move(9,75);
+    move((1.5*size)+10,9);
     attron(A_REVERSE);
-    printw("pulsa enter para volver..");
+    printw("pulsa enter para volver...");
     attroff(A_REVERSE);
 
-   
+    while(getch()!= 10);
+    liberarMemoriaRankingClasico(arrayUsuarios, aux, rankingClasico);
+}
 
-    int auxi = getch();
-    if (auxi == 10)
-    	liberarMemoriaRankingClasico(arrayUsuarios, size, aux, rankingClasico);
+void rankingSupervivencia(Usuario* usuarios, int size)
+{
+	Usuario* arrayUsuarios = (Usuario*) malloc (size * sizeof(Usuario));
+    for (int i=0; i<size; i++)
+    {
+        arrayUsuarios[i] = usuarios[i];
+    }
+
+	Usuario* aux = (Usuario*) malloc (sizeof(Usuario));
+	for (int i=0; i<size-1; i++)
+	{
+		for (int j=0; j<size-i-1; j++)
+		{
+			if (arrayUsuarios[j].puntuaciones[1] < arrayUsuarios[j+1].puntuaciones[1])
+			{
+				*aux = arrayUsuarios[j];
+				arrayUsuarios[j] = arrayUsuarios[j+1];
+				arrayUsuarios[j+1] = *aux;
+			}
+		}
+	}
+
+	noecho();
+	move(9, 46);
+    start_color();
+    init_pair(1, COLOR_WHITE, COLOR_RED);
+    attron(COLOR_PAIR(1));
+    printw("  RANKING SUPERVIVENCIA  ");
+    attroff(COLOR_PAIR(1));
+    WINDOW* rankingSupervivencia = newwin(1.5*size,100,10,9);
+    box(rankingSupervivencia,0,0);
+    refresh();
+    wrefresh(rankingSupervivencia);
+
+    for (int i=0; i<size && i<10; i++)
+    {
+    	mvwprintw(rankingSupervivencia, 1+i, 1, "%d.- %s", (i+1), arrayUsuarios[i].nickname);
+    	mvwprintw(rankingSupervivencia, 1+i, 28, "nivel");
+    	mvwprintw(rankingSupervivencia, 1+i, 36, "%.0f", arrayUsuarios[i].puntuaciones[1]);
+    }
+
+    wrefresh(rankingSupervivencia);
+
+    move((1.5*size)+10,9);
+    attron(A_REVERSE);
+    printw("pulsa enter para volver...");
+    attroff(A_REVERSE);
+
+    while(getch()!= 10);
+    liberarMemoriaRankingSupervivencia(arrayUsuarios, aux, rankingSupervivencia);
 }
