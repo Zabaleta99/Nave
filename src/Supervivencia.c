@@ -20,11 +20,11 @@ static int anchuraTerminal = 0;
 
 void mostrarNivel(int* num_ast)
 {
-	WINDOW* nivel = newwin(alturaTerminal*0.18, anchuraTerminal*0.22,alturaTerminal/2-(alturaTerminal*0.18)/2,anchuraTerminal/2-(anchuraTerminal*0.22)/2);
+	WINDOW* nivel = newwin(3, 12,alturaTerminal/2-1.5,anchuraTerminal/2-5.5);
 	refresh();
 	box(nivel,0,0);
-	wmove(nivel, 2,1);
-	wprintw(nivel, "        NIVEL: %d", *num_ast);
+	wmove(nivel, 1,1);
+	wprintw(nivel, "NIVEL: %d", *num_ast);
 	wrefresh(nivel);
 	sleep(3);
 }
@@ -44,11 +44,11 @@ void subirNivelS(Asteroide* asteroides, int* num_ast)
 
 WINDOW* mostrarGameOverS(void)
 {
-	WINDOW* gameOver = newwin(alturaTerminal*0.18, anchuraTerminal*0.22,alturaTerminal/2-(alturaTerminal*0.18)/2,anchuraTerminal/2-(anchuraTerminal*0.22)/2);
+	WINDOW* gameOver = newwin(3, 11,alturaTerminal/2-1.5,anchuraTerminal/2-5.5);
 	refresh();
 	box(gameOver,0,0);
-	wmove(gameOver,2, 1);
-	wprintw(gameOver, "       GAME OVER");
+	wmove(gameOver,1, 1);
+	wprintw(gameOver, "GAME OVER");
 	wrefresh(gameOver);
 	return gameOver;
 }
@@ -57,10 +57,10 @@ void mostrarVidaExtra(void)
 {
 	int alturaVentanaS = BAJO+3;
 	int anchuraVentanaS = DERECHA+6;
-	WINDOW* vidaExtra = newwin(alturaTerminal*0.18, anchuraTerminal*0.22,alturaTerminal/2-(alturaTerminal*0.18)/2,anchuraTerminal/2-(anchuraTerminal*0.22)/2);
+	WINDOW* vidaExtra = newwin(3, 15,alturaTerminal/2-1.5,anchuraTerminal/2-7.5);
 	refresh();
 	box(vidaExtra,0,0);
-	mvwprintw(vidaExtra,2,1, "      VIDA EXTRA +1");
+	mvwprintw(vidaExtra,1,1, "VIDA EXTRA +1");
 	wrefresh(vidaExtra);
 	sleep(1);
 	wclear(vidaExtra);
@@ -164,7 +164,7 @@ int choqueVidasExtra(WINDOW* ventana, NaveSupervivencia* nave, VidaExtra* vidasE
 
 void pintarVidasS(NaveSupervivencia* nave)
 {
-	move(2,64); printw("%i",nave->vidas);
+	move(2,anchuraTerminal/2+7); printw("%i",nave->vidas);
 	refresh();
 }
 
@@ -184,7 +184,7 @@ void pintarNaveS(WINDOW* ventana, NaveSupervivencia* nave)
 int menuSalidaS(void)
 {
 	mciSendString("pause song.mp3", NULL, 0, NULL);
-	WINDOW* salida = newwin(alturaTerminal/5,DERECHA+6, BAJO+5, IZQUIERDA+6 );
+	WINDOW* salida = newwin(alturaTerminal/5,DERECHA+6, BAJO+5, IZQUIERDA+3 );
     refresh();
     box(salida,0,0);
     keypad(salida, TRUE);
@@ -231,19 +231,11 @@ int menuSalidaS(void)
     	if(eleccion == 10)
     		break;
     }
-    if(seleccion == 0)
-    {
-    	werase(salida);
-    	wrefresh(salida);
-    	return 0;
-    }
-    else
-    {
-    	wclear(salida);
-    	wrefresh(salida);
-    	delwin(salida);
-    	return 1;
-    }
+	wclear(salida);
+	wrefresh(salida);
+	delwin(salida);
+	return seleccion;
+    
 }
 
 WINDOW* mostrarInfoS(void)
@@ -286,11 +278,11 @@ void liberarMemoriaS(NaveSupervivencia* nave, Asteroide* asteroides, int* num_as
 
 void inicializarParametrosS(NaveSupervivencia* nave, Asteroide* asteroides, int* num_ast, VidaExtra* vidasExtra, int* num_vidasExtra)
 {	
-	nave->x = 50;
-	nave->y = 19;
+	nave->x = (DERECHA+6-IZQUIERDA+6)/2;
+	nave->y = (BAJO+3-ALTO)/2;
 	nave->vidas = 3;
 
-	asteroides[0].x = 25;
+	asteroides[0].x = (DERECHA+6-IZQUIERDA+6)/2-3;
 	asteroides[0].y = ALTO;
 	asteroides[0].tipo = 0;
 
@@ -345,11 +337,9 @@ void movimientosJugadorS(int tecla, NaveSupervivencia* nave)
         	break;
     }
 }
-void reestablecerValoresS(int segundos, Asteroide* asteroides, int* num_ast, int choque_asteroide, int choque_vidaExtra)
+void reestablecerValoresS(int segundos, Asteroide* asteroides, int* num_ast)
 {
 	segundos = 0;
-	choque_asteroide = 0;
-	choque_vidaExtra = 0;
 	for(int i=1; i<*num_ast; i++)
 	{
 		asteroides[i].x = 0;
@@ -366,7 +356,7 @@ void guardarPuntuacion(Usuario* usuarios, int player, int* num_ast)
 
 WINDOW* mostrarJuegoS(void)
 {
-	WINDOW* ventana = newwin(BAJO+3, DERECHA+6, ALTO, IZQUIERDA+6);
+	WINDOW* ventana = newwin(BAJO+3, DERECHA+6, ALTO, IZQUIERDA+3);
     refresh();
     keypad(ventana, TRUE);
     nodelay(ventana, TRUE);
@@ -381,8 +371,8 @@ void tamanyoTerminal()
 {
 	getmaxyx(stdscr, alturaTerminal, anchuraTerminal);
 	BAJO = (alturaTerminal * 0.5)+3;
-	ALTO = alturaTerminal*0.1;
-	IZQUIERDA = (anchuraTerminal*0.074)-6;
+	ALTO = alturaTerminal*0.13;
+	IZQUIERDA = (anchuraTerminal*0.074)-3;
 	DERECHA = (anchuraTerminal * 0.85)-6;
 
 }
@@ -402,7 +392,7 @@ void jugarSupervivencia (Usuario* usuarios, int player)
 
 	move(1,3);
 	printw("Bienvenido: MODO SUPERVIVENCIA");
-	move(2,57); 
+	move(2,anchuraTerminal/2); 
 	printw("Vidas: ");
 
 	WINDOW* gameOver;
@@ -470,6 +460,8 @@ void jugarSupervivencia (Usuario* usuarios, int player)
 	        {
 	        	guardarPuntuacion(usuarios, player, num_ast);
 	        	gameOver = mostrarGameOverS();
+	        	choque_asteroide = 0;
+	        	choque_vidaExtra = 0;
 	        	break;
 	        }	
 
@@ -484,7 +476,8 @@ void jugarSupervivencia (Usuario* usuarios, int player)
 	    actualizarS(ventana,nave);
 	    if(menuSalidaS())
     		break;
-    	reestablecerValoresS(segundos, asteroides, num_ast, choque_asteroide, choque_vidaExtra);
+    	wrefresh(ventana);
+    	reestablecerValoresS(segundos, asteroides, num_ast);
     }
 
     liberarMemoriaS(nave, asteroides, num_ast, vidasExtra, num_vidasExtra, ventana, gameOver);
