@@ -231,6 +231,7 @@ int menuIniciarSesion(Usuario *usuarios, int size)
 
     if (boolean == 1)
     {
+    	contadorSalida = 0;
         curs_set(1);
         liberarMemoriaMenuInicioSesion(userIntroduced, passIntroduced, inicioSesion);
         return player;

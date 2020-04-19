@@ -337,9 +337,8 @@ void movimientosJugadorS(int tecla, NaveSupervivencia* nave)
         	break;
     }
 }
-void reestablecerValoresS(int segundos, Asteroide* asteroides, int* num_ast)
+void reestablecerValoresS(Asteroide* asteroides, int* num_ast)
 {
-	segundos = 0;
 	for(int i=1; i<*num_ast; i++)
 	{
 		asteroides[i].x = 0;
@@ -462,6 +461,7 @@ void jugarSupervivencia (Usuario* usuarios, int player)
 	        	gameOver = mostrarGameOverS();
 	        	choque_asteroide = 0;
 	        	choque_vidaExtra = 0;
+	        	segundos = 0;
 	        	break;
 	        }	
 
@@ -477,7 +477,7 @@ void jugarSupervivencia (Usuario* usuarios, int player)
 	    if(menuSalidaS())
     		break;
     	wrefresh(ventana);
-    	reestablecerValoresS(segundos, asteroides, num_ast);
+    	reestablecerValoresS(asteroides, num_ast);
     }
 
     liberarMemoriaS(nave, asteroides, num_ast, vidasExtra, num_vidasExtra, ventana, gameOver);
