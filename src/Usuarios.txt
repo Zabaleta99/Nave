@@ -1,7 +1,8 @@
-6
+7
 paul;hernandez;3.00;7.00
 jon;zaba;0.00;3.00
 joxe;angel;325.50;2.00
 txanogorritxu;basoradoa;638.00;1.00
 joseluis;korta;0.00;2.00
 pernando;hernandez;0.00;0.00
+a;s;0.00;3.00

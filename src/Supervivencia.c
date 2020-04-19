@@ -4,10 +4,14 @@
 #include <unistd.h>
 #include "Supervivencia.h"
 
-#define ALTO 3
-#define IZQUIERDA 2
-#define BAJO 19
-#define DERECHA 95
+static int ALTO = 0;
+static int IZQUIERDA = 0;
+static int BAJO = 0;
+static int DERECHA = 0;
+
+static int alturaTerminal = 0;
+static int anchuraTerminal = 0;
+
 #define MAX_AST 15
 #define MAX_EXTRA 5
 #define MAX_LENGHT 15
@@ -16,11 +20,11 @@
 
 void mostrarNivel(int* num_ast)
 {
-	WINDOW* nivel = newwin(5,21,12,50);
+	WINDOW* nivel = newwin(alturaTerminal*0.18, anchuraTerminal*0.22,alturaTerminal/2-(alturaTerminal*0.18)/2,anchuraTerminal/2-(anchuraTerminal*0.22)/2);
 	refresh();
 	box(nivel,0,0);
-	wmove(nivel,2, 6);
-	wprintw(nivel, "NIVEL: %d", *num_ast);
+	wmove(nivel, 2,1);
+	wprintw(nivel, "        NIVEL: %d", *num_ast);
 	wrefresh(nivel);
 	sleep(3);
 }
@@ -40,21 +44,23 @@ void subirNivelS(Asteroide* asteroides, int* num_ast)
 
 WINDOW* mostrarGameOverS(void)
 {
-	WINDOW* gameOver = newwin(5,21,12,50);
+	WINDOW* gameOver = newwin(alturaTerminal*0.18, anchuraTerminal*0.22,alturaTerminal/2-(alturaTerminal*0.18)/2,anchuraTerminal/2-(anchuraTerminal*0.22)/2);
 	refresh();
 	box(gameOver,0,0);
-	wmove(gameOver,2, 6);
-	wprintw(gameOver, "GAME OVER");
+	wmove(gameOver,2, 1);
+	wprintw(gameOver, "       GAME OVER");
 	wrefresh(gameOver);
 	return gameOver;
 }
 
 void mostrarVidaExtra(void)
 {
-	WINDOW* vidaExtra = newwin(5,21,12,50);
+	int alturaVentanaS = BAJO+3;
+	int anchuraVentanaS = DERECHA+6;
+	WINDOW* vidaExtra = newwin(alturaTerminal*0.18, anchuraTerminal*0.22,alturaTerminal/2-(alturaTerminal*0.18)/2,anchuraTerminal/2-(anchuraTerminal*0.22)/2);
 	refresh();
 	box(vidaExtra,0,0);
-	mvwprintw(vidaExtra, 2, 4, "VIDA EXTRA +1");
+	mvwprintw(vidaExtra,2,1, "      VIDA EXTRA +1");
 	wrefresh(vidaExtra);
 	sleep(1);
 	wclear(vidaExtra);
@@ -178,7 +184,7 @@ void pintarNaveS(WINDOW* ventana, NaveSupervivencia* nave)
 int menuSalidaS(void)
 {
 	mciSendString("pause song.mp3", NULL, 0, NULL);
-	WINDOW* salida = newwin(5,100,24,9);
+	WINDOW* salida = newwin(alturaTerminal/5,DERECHA+6, BAJO+5, IZQUIERDA+6 );
     refresh();
     box(salida,0,0);
     keypad(salida, TRUE);
@@ -242,7 +248,7 @@ int menuSalidaS(void)
 
 WINDOW* mostrarInfoS(void)
 {
-	WINDOW* info = newwin(8,70,9,28);
+	WINDOW* info = newwin(alturaTerminal/3.7,anchuraTerminal/1.7,alturaTerminal/2-alturaTerminal/7.4,anchuraTerminal/2 - anchuraTerminal/3.4);
 	refresh();
 	box(info,0,0);
 	mvwprintw(info,1,1,"El juego consiste en que los asteroides (O) no choquen con la nave.");
@@ -252,19 +258,6 @@ WINDOW* mostrarInfoS(void)
 	mvwprintw(info,6,1,"El juego esta a punto de empezar...");
 	wrefresh(info);
 	return info;
-}
-
-WINDOW* mostrarJuegoS(void)
-{
-	WINDOW* ventana = newwin(BAJO+2, DERECHA+6, 3, 9);
-    refresh();
-    keypad(ventana, TRUE);
-    nodelay(ventana, TRUE);
-    noecho();
-    start_color();
-    init_pair(1, COLOR_BLACK, COLOR_GREEN);
-    wbkgd(ventana, COLOR_PAIR(1));
-    return ventana;
 }
 
 void liberarMemoriaS(NaveSupervivencia* nave, Asteroide* asteroides, int* num_ast, VidaExtra* vidasExtra, int* num_vidasExtra, WINDOW* ventana, WINDOW* gameOver)
@@ -371,11 +364,34 @@ void guardarPuntuacion(Usuario* usuarios, int player, int* num_ast)
 		usuarios[player].puntuaciones[1] = *num_ast;
 }
 
+WINDOW* mostrarJuegoS(void)
+{
+	WINDOW* ventana = newwin(BAJO+3, DERECHA+6, ALTO, IZQUIERDA+6);
+    refresh();
+    keypad(ventana, TRUE);
+    nodelay(ventana, TRUE);
+    noecho();
+    start_color();
+    init_pair(1, COLOR_BLACK, COLOR_GREEN);
+    wbkgd(ventana, COLOR_PAIR(1));
+    return ventana;
+}
+
+void tamanyoTerminal()
+{
+	getmaxyx(stdscr, alturaTerminal, anchuraTerminal);
+	BAJO = (alturaTerminal * 0.5)+3;
+	ALTO = alturaTerminal*0.1;
+	IZQUIERDA = (anchuraTerminal*0.074)-6;
+	DERECHA = (anchuraTerminal * 0.85)-6;
+
+}
+
 void jugarSupervivencia (Usuario* usuarios, int player)
 {
     initscr();
 	curs_set(0);
-	
+	tamanyoTerminal();
 	WINDOW* info = mostrarInfoS();
 
 	mciSendString("play song.mp3 repeat", NULL, 0, NULL);
