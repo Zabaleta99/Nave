@@ -4,10 +4,14 @@
 #include <unistd.h>
 #include "Clasico.h"
 
-#define ALTO 3
-#define IZQUIERDA 2
-#define BAJO 23
-#define DERECHA 95
+static int ALTO = 0;
+static int IZQUIERDA = 0;
+static int BAJO = 0;
+static int DERECHA = 0;
+
+static int alturaTerminal = 0;
+static int anchuraTerminal = 0;
+
 #define MAX_AST 20
 #define MAX_LENGHT 15
 #define MAX_BALAS 200
@@ -26,7 +30,9 @@ void crearBalas (Bala* balas, NaveClasico* nave, int* num_balas)
 
 WINDOW* mostrarGameOverC(void)
 {
-	WINDOW* gameOver = newwin(5,21,5,50);
+	int alturaVentanaClasico = BAJO;
+	int anchuraVentanaClasico = DERECHA+6;
+	WINDOW* gameOver = newwin(alturaTerminal/6,anchuraTerminal/4,alturaVentanaClasico/3.5, anchuraVentanaClasico/2.3);
 	refresh();
 	box(gameOver,0,0);
 	wmove(gameOver,2, 6);
@@ -41,7 +47,9 @@ WINDOW* mostrarPuntuacion (Usuario* usuarios, int player, float tiempo, int* dis
 	if(puntuacionTotal > usuarios[player].puntuaciones[0])
 		usuarios[player].puntuaciones[0] = puntuacionTotal;
 
-	WINDOW* puntuacion = newwin(8,45,12,35);
+	int alturaVentanaClasico = BAJO;
+	int anchuraVentanaClasico = DERECHA+6;
+	WINDOW* puntuacion = newwin(alturaVentanaClasico/3, anchuraVentanaClasico/2, alturaVentanaClasico/1.5, anchuraVentanaClasico/2.3);
 	refresh();
 	box(puntuacion,0,0);
 	wmove(puntuacion,1,2);
@@ -181,7 +189,7 @@ void pintarNaveC(WINDOW* ventana, NaveClasico* nave)
 int menuSalidaC(void)
 {
 	mciSendString("pause song.mp3", NULL, 0, NULL);
-	WINDOW* salida = newwin(5,100,24,9);
+	WINDOW* salida = newwin(alturaTerminal/5,anchuraTerminal-20,alturaTerminal-(alturaTerminal/5)-1, IZQUIERDA+1);
     refresh();
     box(salida,0,0);
     keypad(salida, TRUE);
@@ -344,7 +352,7 @@ void liberarMemoriaC(NaveClasico* nave, Asteroide* asteroides, int* num_ast, Bal
 
 WINDOW* mostrarInfoC(void)
 {
-	WINDOW* info = newwin(8,70,9,28);
+	WINDOW* info = newwin(alturaTerminal/4,anchuraTerminal/1.7,alturaTerminal/2.5, anchuraTerminal/4);
 	refresh();
 	box(info,0,0);
 	mvwprintw(info,1,1,"El juego consiste en que los asteroides no choquen con la nave.");
@@ -358,7 +366,7 @@ WINDOW* mostrarInfoC(void)
 
 WINDOW* mostrarJuegoC(void)
 {
-	WINDOW* ventana = newwin(BAJO+2, DERECHA+6, 3, 9);
+	WINDOW* ventana = newwin(BAJO+3, DERECHA+6, ALTO, IZQUIERDA+1);
     refresh();
     keypad(ventana, TRUE);
     nodelay(ventana, TRUE);
@@ -428,11 +436,21 @@ void movimientosJugadorC(int tecla, NaveClasico* nave, Bala* balas, int* num_bal
     }
 }
 
+void tamanyoAbsolutoC()
+{
+	getmaxyx(stdscr, alturaTerminal, anchuraTerminal);
+	BAJO = (alturaTerminal * 0.83)-3;
+	ALTO = alturaTerminal*0.1;
+	IZQUIERDA = (anchuraTerminal*0.074)-1;
+	DERECHA = (anchuraTerminal * 0.85)-6;
+}
+
 void jugarClasico(Usuario* usuarios, int player)
 {
     initscr();
 	curs_set(0);
 
+	tamanyoAbsolutoC();
 	WINDOW* info = mostrarInfoC();
 
 	mciSendString("play song.mp3 repeat", NULL, 0, NULL);
