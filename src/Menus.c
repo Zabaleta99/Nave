@@ -9,6 +9,8 @@
 #include "Clasico.h" 
 #include <curses.h>
 #include <windows.h>
+static int MAX_X;
+static int MAX_Y;
 static int contadorSalida = 0;
 
 
@@ -107,10 +109,12 @@ void liberarMemoriaMenuPlayer(WINDOW* player, char** opciones)
 int menuInicio(void)
 {
     initscr();
+    cbreak();
     noecho();
     curs_set(0);
-    WINDOW* inicio = newwin(5,100,10,9);
-    move(9, 42);
+    getmaxyx(stdscr, MAX_Y, MAX_X);
+    WINDOW* inicio = newwin(5,MAX_X/2,(MAX_Y/2)-2.5, MAX_X/4);
+    move((MAX_Y/2)-3.5, MAX_X/4+1);
     start_color();
     init_pair(3, COLOR_WHITE, COLOR_RED);
     attron(COLOR_PAIR(3));
@@ -173,11 +177,11 @@ int menuInicio(void)
 int menuIniciarSesion(Usuario *usuarios, int size)
 {
     echo();
-    move(9, 51);
+    move((MAX_Y/2)-3, MAX_X/4+1);
     attron(A_REVERSE);
     printw("  LOGIN  ");
     attroff(A_REVERSE);
-    WINDOW* inicioSesion = newwin(4,100,10,9);
+    WINDOW* inicioSesion = newwin(4,MAX_X/2,(MAX_Y/2)-2, MAX_X/4);
     refresh();
     box(inicioSesion,0,0);
 
@@ -237,7 +241,7 @@ int menuIniciarSesion(Usuario *usuarios, int size)
         start_color();
         init_pair(2, COLOR_WHITE, COLOR_BLUE);
         wattron(stdscr, COLOR_PAIR(2));
-        move(16, 9);
+        move((MAX_Y/2)+4, MAX_X/4);
         wprintw(stdscr, "YOU HAVE ENTERED WRONGLY 3 TIMES. TRY NEXT TIME...");
         wattroff(stdscr, COLOR_PAIR(2));
         refresh();
@@ -251,15 +255,15 @@ int menuIniciarSesion(Usuario *usuarios, int size)
 
     if(boolean == -1)
     {
-        move(14, 9);
-        wprintw(stdscr, "INCORRECT PASSWORD! TRY AGAIN");
+        move((MAX_Y/2)+3, MAX_X/4);
+        printw("INCORRECT PASSWORD! TRY AGAIN");
         contadorSalida++;
         menuIniciarSesion(usuarios, size);
     }
 
     if (boolean == 0)
     {
-        move(14, 9);
+        move((MAX_Y/2)+3, MAX_X/4);
         wprintw(stdscr, "INCORRECT NICKNAME! TRY AGAIN");
         contadorSalida++;
         menuIniciarSesion(usuarios, size); 
@@ -270,12 +274,12 @@ void menuRegistrarse (Usuario *usuarios, int size)
 {
     Usuario *usuariosActualizados;
     echo();
-    move(9, 51);
+    move((MAX_Y/2)-3.5, MAX_X/4+1);
     attron(A_REVERSE);
     printw("    REGISTRATE    ");
     attroff(A_REVERSE);
     
-    WINDOW* registro = newwin(5,100,10,9);
+    WINDOW* registro = newwin(5,MAX_X/2,(MAX_Y/2)-2.5, MAX_X/4);
     refresh();
     box(registro,0,0);
     
@@ -317,7 +321,7 @@ void menuRegistrarse (Usuario *usuarios, int size)
 
     while (bl == 1)
     {
-        move(15, 9);
+        move((MAX_Y/2)+3.5, MAX_X/4);
         wprintw(stdscr, "THAT NICKNAME ALREADY EXISTS! TRY AGAIN");
         refresh();
         wmove(registro, 1, 11);
@@ -339,7 +343,7 @@ void menuRegistrarse (Usuario *usuarios, int size)
         }
     }
 
-    move(15, 9);
+    move((MAX_Y/2)+3.5, MAX_X/4);
     wprintw(stdscr, "                                         ");
     refresh();
 
@@ -356,14 +360,14 @@ void menuRegistrarse (Usuario *usuarios, int size)
 
     if (strcmp(passIntroduced, passConfiIntroduced) != 0)
     {
-        move(15, 9);
+        move((MAX_Y/2)+3.5, MAX_X/4);
         wprintw(stdscr, "PASSWORDS ARE DIFFERENT! TRY AGAIN");
         menuRegistrarse(usuarios, size);
     }
 
     else
     {
-        move(15, 9);
+        move((MAX_Y/2)+3.5, MAX_X/4);
         wprintw(stdscr, "REGISTRADO!");
         refresh();
 
@@ -395,8 +399,8 @@ int menuPlayer(void)
 {
     curs_set(0);
     noecho();
-    WINDOW* player = newwin(8,100,10,9);
-    move(9, 50);
+    WINDOW* player = newwin(7, MAX_X/2, (MAX_Y/2)-3.5, MAX_X/4);
+    move((MAX_Y/2)-4.5, MAX_X/4);
     start_color();
     init_pair(3, COLOR_WHITE, COLOR_RED);
     attron(COLOR_PAIR(3));

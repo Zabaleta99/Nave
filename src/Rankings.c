@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "Menus.h"
 #include "Usuarios.h"
+static int MAX_X;
+static int MAX_Y;
 
 void liberarMemoriaRankingClasico (Usuario* arrayusuarios, Usuario* aux, WINDOW* rankingClasico)
 {
@@ -36,6 +38,7 @@ void liberarMemoriaRankingSupervivencia(Usuario* arrayusuarios, Usuario* aux, WI
 
 void rankingClasico (Usuario* usuarios, int size)
 {
+    getmaxyx(stdscr, MAX_Y, MAX_X);
 	Usuario* arrayUsuarios = (Usuario*) malloc (size * sizeof(Usuario));
     for (int i=0; i<size; i++)
     {
@@ -57,13 +60,13 @@ void rankingClasico (Usuario* usuarios, int size)
 	}
 
 	noecho();
-	move(9, 48);
+	move((MAX_Y/2)-(1.5*size)/2-1, MAX_X/4);
     start_color();
     init_pair(1, COLOR_WHITE, COLOR_RED);
     attron(COLOR_PAIR(1));
     printw("  RANKING CLASICO  ");
     attroff(COLOR_PAIR(1));
-    WINDOW* rankingClasico = newwin(1.5*size,100,10,9);
+    WINDOW* rankingClasico = newwin(1.5*size,MAX_X/2,(MAX_Y/2)-(1.5*size)/2,MAX_X/4);
     box(rankingClasico,0,0);
     refresh();
     wrefresh(rankingClasico);
@@ -77,7 +80,7 @@ void rankingClasico (Usuario* usuarios, int size)
 
     wrefresh(rankingClasico);
 
-    move((1.5*size)+10,9);
+    move((MAX_Y/2)+(1.5*size)/2+1,MAX_X/4);
     attron(A_REVERSE);
     printw("pulsa enter para volver...");
     attroff(A_REVERSE);
@@ -88,6 +91,7 @@ void rankingClasico (Usuario* usuarios, int size)
 
 void rankingSupervivencia(Usuario* usuarios, int size)
 {
+    getmaxyx(stdscr, MAX_Y, MAX_X);
 	Usuario* arrayUsuarios = (Usuario*) malloc (size * sizeof(Usuario));
     for (int i=0; i<size; i++)
     {
@@ -109,13 +113,13 @@ void rankingSupervivencia(Usuario* usuarios, int size)
 	}
 
 	noecho();
-	move(9, 46);
+	move((MAX_Y/2)-(1.5*size)/2-1,MAX_X/4);
     start_color();
     init_pair(1, COLOR_WHITE, COLOR_RED);
     attron(COLOR_PAIR(1));
     printw("  RANKING SUPERVIVENCIA  ");
     attroff(COLOR_PAIR(1));
-    WINDOW* rankingSupervivencia = newwin(1.5*size,100,10,9);
+    WINDOW* rankingSupervivencia = newwin(1.5*size,MAX_X/2,(MAX_Y/2)-(1.5*size)/2,MAX_X/4);
     box(rankingSupervivencia,0,0);
     refresh();
     wrefresh(rankingSupervivencia);
@@ -129,7 +133,7 @@ void rankingSupervivencia(Usuario* usuarios, int size)
 
     wrefresh(rankingSupervivencia);
 
-    move((1.5*size)+10,9);
+    move((MAX_Y/2)+(1.5*size)/2+1,MAX_X/4);
     attron(A_REVERSE);
     printw("pulsa enter para volver...");
     attroff(A_REVERSE);
