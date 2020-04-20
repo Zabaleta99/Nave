@@ -27,6 +27,10 @@ void mostrarNivel(int* num_ast)
 	wprintw(nivel, "NIVEL: %d", *num_ast);
 	wrefresh(nivel);
 	sleep(3);
+	wclear(nivel);
+	wrefresh(nivel);
+	delwin(nivel);
+	refresh();
 }
 
 void subirNivelS(Asteroide* asteroides, int* num_ast)
@@ -42,7 +46,7 @@ void subirNivelS(Asteroide* asteroides, int* num_ast)
 	}
 }
 
-WINDOW* mostrarGameOverS(void)
+void mostrarGameOverS(void)
 {
 	WINDOW* gameOver = newwin(3, 11,alturaTerminal/2-1.5,anchuraTerminal/2-5.5);
 	refresh();
@@ -50,7 +54,8 @@ WINDOW* mostrarGameOverS(void)
 	wmove(gameOver,1, 1);
 	wprintw(gameOver, "GAME OVER");
 	wrefresh(gameOver);
-	return gameOver;
+	wclear(gameOver);
+	delwin(gameOver);
 }
 
 void mostrarVidaExtra(void)
@@ -252,7 +257,7 @@ WINDOW* mostrarInfoS(void)
 	return info;
 }
 
-void liberarMemoriaS(NaveSupervivencia* nave, Asteroide* asteroides, int* num_ast, VidaExtra* vidasExtra, int* num_vidasExtra, WINDOW* ventana, WINDOW* gameOver)
+void liberarMemoriaS(NaveSupervivencia* nave, Asteroide* asteroides, int* num_ast, VidaExtra* vidasExtra, int* num_vidasExtra, WINDOW* ventana)
 {
 	mciSendString("stop song.mp3", NULL, 0, NULL);
     mciSendString("close song.mp3", NULL, 0, NULL);
@@ -269,20 +274,17 @@ void liberarMemoriaS(NaveSupervivencia* nave, Asteroide* asteroides, int* num_as
     wclear(ventana);
     wrefresh(ventana);
     delwin(ventana);
-    wclear(gameOver);
-    wrefresh(gameOver);
-    delwin(gameOver);
     clear();
     refresh();
 }
 
 void inicializarParametrosS(NaveSupervivencia* nave, Asteroide* asteroides, int* num_ast, VidaExtra* vidasExtra, int* num_vidasExtra)
 {	
-	nave->x = (DERECHA+6-IZQUIERDA+6)/2;
-	nave->y = (BAJO+3-ALTO)/2;
+	nave->x = (DERECHA+6)/2;
+	nave->y = 3*(BAJO+3)/4;
 	nave->vidas = 3;
 
-	asteroides[0].x = (DERECHA+6-IZQUIERDA+6)/2-3;
+	asteroides[0].x = (DERECHA+6)/2-3;
 	asteroides[0].y = ALTO;
 	asteroides[0].tipo = 0;
 
@@ -394,7 +396,6 @@ void jugarSupervivencia (Usuario* usuarios, int player)
 	move(2,anchuraTerminal/2); 
 	printw("Vidas: ");
 
-	WINDOW* gameOver;
 	WINDOW* ventana = mostrarJuegoS();
 
     NaveSupervivencia* nave = malloc(sizeof(NaveSupervivencia));
@@ -458,7 +459,7 @@ void jugarSupervivencia (Usuario* usuarios, int player)
 	        if(nave->vidas == 0)
 	        {
 	        	guardarPuntuacion(usuarios, player, num_ast);
-	        	gameOver = mostrarGameOverS();
+	        	mostrarGameOverS();
 	        	choque_asteroide = 0;
 	        	choque_vidaExtra = 0;
 	        	segundos = 0;
@@ -480,6 +481,6 @@ void jugarSupervivencia (Usuario* usuarios, int player)
     	reestablecerValoresS(asteroides, num_ast);
     }
 
-    liberarMemoriaS(nave, asteroides, num_ast, vidasExtra, num_vidasExtra, ventana, gameOver);
+    liberarMemoriaS(nave, asteroides, num_ast, vidasExtra, num_vidasExtra, ventana);
 	endwin();
 }

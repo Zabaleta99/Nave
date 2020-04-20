@@ -28,20 +28,21 @@ void crearBalas (Bala* balas, NaveClasico* nave, int* num_balas)
 	}
 }
 
-WINDOW* mostrarGameOverC(void)
+void mostrarGameOverC(void)
 {
 	int alturaVentanaClasico = BAJO;
 	int anchuraVentanaClasico = DERECHA+6;
-	WINDOW* gameOver = newwin(alturaTerminal/6,anchuraTerminal/4,alturaVentanaClasico/3.5, anchuraVentanaClasico/2.3);
+	WINDOW* gameOver = newwin(alturaTerminal/6,anchuraTerminal/4,alturaVentanaClasico/4.2, anchuraVentanaClasico/2.3);
 	refresh();
 	box(gameOver,0,0);
 	wmove(gameOver,2, 6);
 	wprintw(gameOver, "GAME OVER");
 	wrefresh(gameOver);
-	return gameOver;
+	wclear(gameOver);
+	delwin(gameOver);
 }
 
-WINDOW* mostrarPuntuacion (Usuario* usuarios, int player, float tiempo, int* disparosAcertados)
+void mostrarPuntuacion (Usuario* usuarios, int player, float tiempo, int* disparosAcertados)
 {
 	float puntuacionTotal = tiempo*10 + *disparosAcertados;
 	if(puntuacionTotal > usuarios[player].puntuaciones[0])
@@ -49,7 +50,7 @@ WINDOW* mostrarPuntuacion (Usuario* usuarios, int player, float tiempo, int* dis
 
 	int alturaVentanaClasico = BAJO;
 	int anchuraVentanaClasico = DERECHA+6;
-	WINDOW* puntuacion = newwin(alturaVentanaClasico/3, anchuraVentanaClasico/2, alturaVentanaClasico/1.5, anchuraVentanaClasico/2.3);
+	WINDOW* puntuacion = newwin(7, 45, alturaTerminal/2-3.5, anchuraTerminal/2-22.5);
 	refresh();
 	box(puntuacion,0,0);
 	wmove(puntuacion,1,2);
@@ -63,7 +64,8 @@ WINDOW* mostrarPuntuacion (Usuario* usuarios, int player, float tiempo, int* dis
 	wmove(puntuacion,5,2);
 	wprintw(puntuacion,"TOTAL: %0.2f", puntuacionTotal);
 	wrefresh(puntuacion);
-	return puntuacion;
+	wclear(puntuacion);
+	delwin(puntuacion);
 }
 
 void pintarNaveChoqueC(WINDOW* ventana, NaveClasico* nave)
@@ -245,23 +247,23 @@ int menuSalidaC(void)
 
 void pintarVidasC(NaveClasico* nave)
 {
-	move(2,38); printw("%i",nave->vidas);
+	move(2,8); printw("%i",nave->vidas);
 	
-	mvprintw(2,53,"   ");
+	mvprintw(2,19,"   ");
 	for(int i=0; i<nave->corazones;i++)
 	{
-		mvprintw(2,53+i,"O");
+		mvprintw(2,19+i,"O");
 	}
 	refresh();
 }
 
 void actualizarDisparosAcertados (int* disparosAcertados, int* num_balas)
 {
-	mvprintw(2, 86, "  ");
-	mvprintw(2, 65, "Disparos Acertados: %d", *disparosAcertados);
+	mvprintw(2, 45, "   ");
+	mvprintw(2, 25, "Disparos Acertados: %d", *disparosAcertados);
 	
-	mvprintw(2, 107, "  ");
-	mvprintw(2, 95, "Restantes: %d", (MAX_BALAS-*num_balas));
+	mvprintw(2, 62, "   ");
+	mvprintw(2, 51, "Restantes: %d", (MAX_BALAS-*num_balas));
 	refresh();
 }
 
@@ -305,8 +307,8 @@ void subirNivelC(Asteroide* asteroides, int* num_ast)
 
 void inicializarParametrosC(NaveClasico* nave, Asteroide* asteroides, int* num_ast, int* num_balas, int* disparosAcertados)
 {
-    nave->x = 50;
-    nave->y = 19;
+    nave->x = (DERECHA+6)/2;
+    nave->y = 3*(BAJO+3)/4;
     nave->corazones = 3;
     nave->vidas = 3;
 
@@ -321,7 +323,7 @@ void inicializarParametrosC(NaveClasico* nave, Asteroide* asteroides, int* num_a
 	*disparosAcertados = 0;
 }
 
-void liberarMemoriaC(NaveClasico* nave, Asteroide* asteroides, int* num_ast, Bala* balas, int* num_balas, int* disparosAcertados, WINDOW* ventana, WINDOW* gameOver, WINDOW* puntuacion)
+void liberarMemoriaC(NaveClasico* nave, Asteroide* asteroides, int* num_ast, Bala* balas, int* num_balas, int* disparosAcertados, WINDOW* ventana)
 {
 	mciSendString("stop song.mp3", NULL, 0, NULL);
     mciSendString("close song.mp3", NULL, 0, NULL);
@@ -340,12 +342,6 @@ void liberarMemoriaC(NaveClasico* nave, Asteroide* asteroides, int* num_ast, Bal
     wclear(ventana);
     wrefresh(ventana);
     delwin(ventana);
-    wclear(gameOver);
-    wrefresh(gameOver);
-    delwin(gameOver);
-    wclear(puntuacion);
-    wrefresh(puntuacion);
-    delwin(puntuacion);
     clear();
     refresh();
 }
@@ -377,13 +373,8 @@ WINDOW* mostrarJuegoC(void)
     return ventana;
 }
 
-void reestablecerValoresC(int segundos, int tiempo, Asteroide* asteroides, int* num_ast, Bala* balas, int* num_balas, int* disparosAcertados, int choqueAsteroide, int choqueBala)
+void reestablecerValoresC(Asteroide* asteroides, int* num_ast, Bala* balas, int* num_balas, int* disparosAcertados)
 {
-	segundos = 0;
-	tiempo = 0;
-	choqueAsteroide = 0;
-	choqueBala = 0;
-
 	for(int i=0; i<*num_ast; i++)
 	{
 		asteroides[i].x = 0;
@@ -440,7 +431,7 @@ void tamanyoAbsolutoC()
 {
 	getmaxyx(stdscr, alturaTerminal, anchuraTerminal);
 	BAJO = (alturaTerminal * 0.83)-3;
-	ALTO = alturaTerminal*0.1;
+	ALTO = alturaTerminal*0.13;
 	IZQUIERDA = (anchuraTerminal*0.074)-1;
 	DERECHA = (anchuraTerminal * 0.85)-6;
 }
@@ -461,15 +452,12 @@ void jugarClasico(Usuario* usuarios, int player)
 
 	move(1,3);
 	printw("Bienvenido: MODO CLASICO");	    
-	move(2,30); 
+	move(2,1); 
 	printw("Vidas: ");
-	move(2,45); 
+	move(2,12); 
 	printw("Salud: ");
 
     WINDOW* ventana = mostrarJuegoC();
-
-    WINDOW* gameOver;
-    WINDOW* puntuacion;
 
     NaveClasico* nave = malloc(sizeof(NaveClasico));
     Asteroide* asteroides = malloc(MAX_AST * sizeof(Asteroide));
@@ -500,7 +488,6 @@ void jugarClasico(Usuario* usuarios, int player)
 	        if(segundos > 30)
 	        {
 	        	subirNivelC(asteroides, num_ast);
-	        	tiempo += segundos;
 	        	segundos = 0;
 	        }
 
@@ -553,8 +540,12 @@ void jugarClasico(Usuario* usuarios, int player)
         	}
         	if(nave->vidas == 0)
         	{
-        		gameOver = mostrarGameOverC();
-        		puntuacion = mostrarPuntuacion(usuarios, player, tiempo,disparosAcertados);
+        		mostrarGameOverC();
+        		mostrarPuntuacion(usuarios, player, tiempo,disparosAcertados);
+        		choqueAsteroide = 0;
+	        	choqueBala = 0;
+	        	segundos = 0;
+	        	tiempo = 0;
         		break;
         	}
 
@@ -563,14 +554,15 @@ void jugarClasico(Usuario* usuarios, int player)
 
 	        Sleep(50);
 	        segundos +=0.050;
+	        tiempo +=0.050;
 	        choqueAsteroide = 0;
 	        choqueBala = 0;
 	    }
 	    actualizarC(ventana, nave, disparosAcertados, num_balas);
 	    if(menuSalidaC())
     		break;
-    	reestablecerValoresC(segundos, tiempo, asteroides, num_ast, balas, num_balas, disparosAcertados, choqueAsteroide, choqueBala);
+    	reestablecerValoresC(asteroides, num_ast, balas, num_balas, disparosAcertados);
     }
-    liberarMemoriaC(nave, asteroides, num_ast, balas, num_balas, disparosAcertados, ventana, gameOver, puntuacion);
+    liberarMemoriaC(nave, asteroides, num_ast, balas, num_balas, disparosAcertados, ventana);
 	endwin();
 }
